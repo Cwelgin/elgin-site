@@ -2,161 +2,7 @@
 ============================================================
 
     artwork.js
-    ELGIN Core v1.0.0
-    Shared artwork renderer
-
-============================================================
-
-    Responsibilities
-
-    • Read artwork metadata
-    • Build artwork layout 
-    • Render metadata
-    • Load hero image
-    • Initialize lightbox
-
-============================================================
-*/
-
-const Artwork = {
-
-    /******************************************************
-     * ENTRY POINT
-     ******************************************************/
-
-    async initialize(){
-
-        const element =
-            document.querySelector(".artwork");
-
-        if(!element){
-
-            return;
-
-        }
-
-        const artwork =
-            this.readMetadata(element);
-
-        this.buildLayout(
-            element,
-            artwork
-        );
-
-        this.renderMetadata(
-            element.querySelector(".meta"),
-            artwork
-        );
-
-        await this.loadHeroImage(
-            element.querySelector(".artwork-image")
-        );
-
-    },
-
-
-    /******************************************************
-     * READ METADATA
-     ******************************************************/
-
-    readMetadata(element){
-
-        const json =
-            element.querySelector(
-                'script[type="application/json"]'
-            );
-
-        if(!json){
-
-            console.error(
-                "Artwork metadata not found."
-            );
-
-            return this.defaultMetadata();
-
-        }
-
-        let artwork;
-
-        try{
-
-            artwork =
-                JSON.parse(
-                    json.textContent
-                );
-
-        }
-
-        catch(error){
-
-            console.error(
-                "Invalid artwork metadata.",
-                error
-            );
-
-            return this.defaultMetadata();
-
-        }
-
-        return {
-
-            id:
-                artwork.id || "",
-
-            series:
-                artwork.series || "",
-
-            title:
-                artwork.title || "",
-
-            atlas:
-                artwork.atlas || "",
-
-            regime:
-                artwork.regime || "",
-
-            medium:
-                artwork.medium || "",
-
-            dimensions:
-                artwork.dimensions || "",
-
-            date:
-                artwork.date || "",
-
-            statement:
-                artwork.statement || ""
-
-        };
-
-    },
-
-
-    /******************************************************
-     * DEFAULT METADATA
-     ******************************************************/
-
-    defaultMetadata(){
-
-        return {
-
-            id:"",
-            series:"",
-            title:"",
-            atlas:"",
-            regime:"",
-            medium:"",
-            dimensions:"",
-            date:"",
-            statement:""
-
-        };
-
-    },/*
-============================================================
-
-    artwork.js
-    ELGIN Core v1.0.0
+    ELGIN Core v2.0.0
     Shared artwork renderer
 
 ============================================================
@@ -190,7 +36,9 @@ const Artwork = {
         }
 
         const artwork =
-            this.readMetadata(element);
+            this.readMetadata(
+                element
+            );
 
         this.buildLayout(
             element,
@@ -198,12 +46,21 @@ const Artwork = {
         );
 
         this.renderMetadata(
-            element.querySelector(".meta"),
+
+            element.querySelector(
+                ".meta"
+            ),
+
             artwork
+
         );
 
         await this.loadHeroImage(
-            element.querySelector(".artwork-image")
+
+            element.querySelector(
+                ".artwork-image"
+            )
+
         );
 
     },
@@ -230,58 +87,33 @@ const Artwork = {
 
         }
 
-        let artwork;
-
         try{
 
-            artwork =
-                JSON.parse(
+            return {
+
+                ...this.defaultMetadata(),
+
+                ...JSON.parse(
                     json.textContent
-                );
+                )
+
+            };
 
         }
 
         catch(error){
 
             console.error(
+
                 "Invalid artwork metadata.",
+
                 error
+
             );
 
             return this.defaultMetadata();
 
         }
-
-        return {
-
-            id:
-                artwork.id || "",
-
-            series:
-                artwork.series || "",
-
-            title:
-                artwork.title || "",
-
-            atlas:
-                artwork.atlas || "",
-
-            regime:
-                artwork.regime || "",
-
-            medium:
-                artwork.medium || "",
-
-            dimensions:
-                artwork.dimensions || "",
-
-            date:
-                artwork.date || "",
-
-            statement:
-                artwork.statement || ""
-
-        };
 
     },
 
@@ -311,13 +143,9 @@ const Artwork = {
      * BUILD LAYOUT
      ******************************************************/
 
-   /******************************************************
- * BUILD LAYOUT
- ******************************************************/
+    buildLayout(element, artwork){
 
-buildLayout(element, artwork){
-
-    element.innerHTML = `
+        element.innerHTML = `
 
 <div class="artwork-header">
 
@@ -347,13 +175,17 @@ buildLayout(element, artwork){
 
 `;
 
-    if(!document.querySelector(".artwork-lightbox")){
+        if(
+            !document.querySelector(
+                ".artwork-lightbox"
+            )
+        ){
 
-        document.body.insertAdjacentHTML(
+            document.body.insertAdjacentHTML(
 
-            "beforeend",
+                "beforeend",
 
-            `
+                `
 
 <div class="artwork-lightbox">
 
@@ -369,11 +201,11 @@ buildLayout(element, artwork){
 
 `
 
-        );
+            );
 
-    }
+        }
 
-},
+    },
 
 
     /******************************************************
@@ -408,6 +240,7 @@ buildLayout(element, artwork){
                 "beforeend",
 
                 `
+
 <p>
 
     <strong>${label}</strong>
@@ -415,6 +248,7 @@ buildLayout(element, artwork){
     ${value}
 
 </p>
+
 `
 
             );
@@ -451,9 +285,12 @@ buildLayout(element, artwork){
                 )
 
             ].map(anchor=>anchor.href);
-            console.log(images);
 
             if(!images.length){
+
+                console.warn(
+                    "No gallery image found."
+                );
 
                 return;
 
@@ -497,13 +334,11 @@ buildLayout(element, artwork){
         }
 
     },
-
-
     /******************************************************
      * INITIALIZE LIGHTBOX
      ******************************************************/
 
-    initializeLightbox(image,source){
+    initializeLightbox(image, source){
 
         const overlay =
             document.querySelector(
@@ -533,6 +368,58 @@ buildLayout(element, artwork){
 
         };
 
+        if(!overlay.dataset.initialized){
+
+            overlay
+                .querySelector(
+                    ".artwork-close"
+                )
+                .addEventListener(
+                    "click",
+                    close
+                );
+
+            overlay.addEventListener(
+
+                "click",
+
+                event=>{
+
+                    if(
+                        event.target === overlay
+                    ){
+
+                        close();
+
+                    }
+
+                }
+
+            );
+
+            document.addEventListener(
+
+                "keydown",
+
+                event=>{
+
+                    if(
+                        event.key === "Escape"
+                    ){
+
+                        close();
+
+                    }
+
+                }
+
+            );
+
+            overlay.dataset.initialized =
+                "true";
+
+        }
+
         image.addEventListener(
 
             "click",
@@ -548,51 +435,6 @@ buildLayout(element, artwork){
                 document.body.classList.add(
                     "artwork-lightbox-open"
                 );
-
-            }
-
-        );
-
-        overlay
-            .querySelector(
-                ".artwork-close"
-            )
-            .addEventListener(
-                "click",
-                close
-            );
-
-        overlay.addEventListener(
-
-            "click",
-
-            event=>{
-
-                if(
-                    event.target === overlay
-                ){
-
-                    close();
-
-                }
-
-            }
-
-        );
-
-        document.addEventListener(
-
-            "keydown",
-
-            event=>{
-
-                if(
-                    event.key === "Escape"
-                ){
-
-                    close();
-
-                }
 
             }
 
@@ -614,3 +456,4 @@ document.addEventListener(
     ()=>Artwork.initialize()
 
 );
+    
