@@ -1,3 +1,6 @@
+const SHEET_URL =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRVojs1qLtfQIp7KKv8Zdjz7f7ZmUAh1AEKa521ddmeaBjsSmFsIjtwvu5GRCX1anqcpLrXGbRf_POy/pub?gid=0&single=true&output=csv";
+
 /*
 ============================================================
 
@@ -24,121 +27,158 @@ const Artwork = {
      * ENTRY POINT
      ******************************************************/
 
-    async initialize(){
+   async initialize(){
 
-        const element =
-            document.querySelector(".artwork");
+    const element =
+        document.querySelector(".artwork");
 
-        if(!element){
+    if(!element){
 
-            return;
+        return;
 
-        }
+    }
 
-        const artwork =
-            this.readMetadata(
-                element
-            );
+    const id =
+        element.dataset.id;
 
-        this.buildLayout(
-            element,
-            artwork
+    if(!id){
+
+        console.error(
+            "Artwork ID not found."
         );
 
-        this.renderMetadata(
+        return;
 
-            element.querySelector(
-                ".meta"
-            ),
+    }
 
-            artwork
+let artwork;
 
+try{
+
+    artwork =
+        await this.loadArtwork(id);
+
+}
+
+catch(error){
+
+    console.error(error);
+
+    return;
+
+}
+
+    if(!artwork){
+
+        console.error(
+            `Artwork ${id} not found.`
         );
 
-        await this.loadHeroImage(
+        return;
 
-            element.querySelector(
-                ".artwork-image"
-            )
+    }
 
+    this.buildLayout(
+        element,
+        artwork
+    );
+
+    this.renderMetadata(
+
+        element.querySelector(".meta"),
+
+        artwork
+
+    );
+
+    await this.loadHeroImage(
+
+        element.querySelector(
+            ".artwork-image"
+        )
+
+    );
+
+},
+
+async loadArtwork(id){
+
+    const response =
+        await fetch(SHEET_URL);
+
+    if(!response.ok){
+
+        throw new Error(
+            "Unable to load artwork spreadsheet."
         );
 
-    },
+    }
+
+    const csv =
+        await response.text();
+
+    const rows =
+        this.parseCSV(csv);
+
+return rows.find(
+
+    artwork =>
+
+        artwork.id.trim().toUpperCase() ===
+        id.trim().toUpperCase()
+
+);
+
+},
 
 
-    /******************************************************
-     * READ METADATA
-     ******************************************************/
+parseCSV(csv){
 
-    readMetadata(element){
+    const lines =
+        csv.trim().split("\n");
 
-        const json =
-            element.querySelector(
-                'script[type="application/json"]'
-            );
+    const headers =
+        lines.shift().split(",");
 
-        if(!json){
+    return lines.map(line=>{
 
-            console.error(
-                "Artwork metadata not found."
-            );
+        const values =
+            line.split(",");
 
-            return this.defaultMetadata();
+        const artwork = {};
 
-        }
+        headers.forEach((header,index)=>{
 
-        try{
+            artwork[
+                header.trim()
+            ] =
+                values[index]?.trim() || "";
 
-            return {
+        });
 
-                ...this.defaultMetadata(),
+        artwork.dimensions =
 
-                ...JSON.parse(
-                    json.textContent
-                )
+            artwork.width && artwork.height
 
-            };
+                ? `${artwork.width}" × ${artwork.height}"`
 
-        }
+                : "";
 
-        catch(error){
+artwork.date =
 
-            console.error(
+    artwork.startDate &&
+    artwork.endDate
 
-                "Invalid artwork metadata.",
+        ? `${artwork.startDate} – ${artwork.endDate}`
 
-                error
+        : artwork.startDate;
 
-            );
+        return artwork;
 
-            return this.defaultMetadata();
+    });
 
-        }
-
-    },
-
-
-    /******************************************************
-     * DEFAULT METADATA
-     ******************************************************/
-
-    defaultMetadata(){
-
-        return {
-
-            id:"",
-            series:"",
-            title:"",
-            atlas:"",
-            regime:"",
-            medium:"",
-            dimensions:"",
-            date:"",
-            statement:""
-
-        };
-
-    },
+},
+    
 
 /******************************************************
      * BUILD LAYOUT
@@ -158,18 +198,7 @@ const Artwork = {
 
         <div class="meta"></div>
 
-        ${
-            artwork.statement
-                ? `
-        <div class="statement">
-
-            ${artwork.statement}
-
-        </div>
-        `
-                : ""
-        }
-
+        
     </div>
 
 </div>
