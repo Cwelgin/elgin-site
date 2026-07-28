@@ -17,7 +17,17 @@ h1[data-animation-role="header-element"]{
     display:none !important;
 
 }
+/* ==========================================================
+   HIDE SQUARESPACE HEADER DURING LIGHTBOX
+   ========================================================== */
 
+body.artwork-lightbox-open header,
+body.artwork-lightbox-open .header,
+body.artwork-lightbox-open #header{
+
+    visibility:hidden !important;
+
+}
 
 /* ==========================================================
    PAGE WIDTH
