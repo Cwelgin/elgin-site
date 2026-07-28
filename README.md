@@ -1,12 +1,20 @@
-# elgin-site
-Shared code for cliffelgin.com
+elgin-site/
 
-    artwork.js
-    artwork.css
-    gallery.js
-    gallery.css
-    artwork.json
-    search.js
-    search-index.json
-    collections.js
+    css/
+        artwork.css
+        gallery.css
+
+    js/
+        artwork.js
+        gallery.js
+
+    
+    data/
+        artworks.json
+        collections.json
+
+    search/
+        search.js
+        search-index.json
+
     README.md
