@@ -1,0 +1,245 @@
+/*
+    artwork.css
+    ELGIN Core v1.0.0
+    Shared artwork renderer
+*/
+
+/* ==========================================================
+   HIDE SQUARESPACE PAGE TITLE
+   ========================================================== */
+
+.blog-item-title,
+.item-title,
+.entry-title,
+.sqs-title,
+h1[data-animation-role="header-element"]{
+
+    display:none !important;
+
+}
+
+
+/* ==========================================================
+   PAGE WIDTH
+   ========================================================== */
+
+@media screen and (min-width:768px){
+
+    .tweak-blog-item-width-narrow
+    .blog-item-wrapper
+    .blog-item-inner-wrapper{
+
+        width:100% !important;
+        max-width:800px !important;
+        margin:0 auto !important;
+
+    }
+
+}
+
+
+/* ==========================================================
+   ARTWORK LAYOUT
+   ========================================================== */
+
+.artwork-header{
+
+    display:grid;
+
+    grid-template-columns:
+        minmax(320px,600px)
+        340px;
+
+    gap:80px;
+
+    justify-content:center;
+    align-items:start;
+
+    max-width:1100px;
+
+    margin:0 auto 40px;
+
+}
+
+
+/* ==========================================================
+   HERO IMAGE
+   ========================================================== */
+
+.artwork-image{
+
+    display:flex;
+
+    justify-content:center;
+    align-items:flex-start;
+
+}
+
+.artwork-image img{
+
+    display:block;
+
+    width:100%;
+    max-height:600px;
+
+    object-fit:contain;
+
+    cursor:zoom-in;
+
+    transition:opacity .18s ease;
+
+}
+
+.artwork-image img:hover{
+
+    opacity:.97;
+
+}
+
+
+/* ==========================================================
+   METADATA
+   ========================================================== */
+
+.artwork-info{
+
+    line-height:1.6;
+
+}
+
+.artwork-info h1{
+
+    margin:0 0 34px;
+
+    font-size:2.6rem;
+
+    font-weight:500;
+
+    letter-spacing:.03em;
+
+    text-transform:uppercase;
+
+}
+
+.artwork-info .meta{
+
+    color:#666;
+
+    font-size:1rem;
+
+}
+
+.artwork-info .meta p{
+
+    margin:0 0 18px;
+
+}
+
+.artwork-info .meta strong{
+
+    display:block;
+
+    color:#222;
+
+    font-weight:600;
+
+    margin-bottom:2px;
+
+}
+
+.artwork-info .statement{
+
+    margin-top:40px;
+
+    color:#222;
+
+    line-height:1.8;
+
+    font-size:1.05rem;
+
+}
+
+
+/* ==========================================================
+   LIGHTBOX
+   ========================================================== */
+
+.artwork-lightbox{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+    align-items:center;
+
+    background:rgba(0,0,0,.97);
+
+    opacity:0;
+    visibility:hidden;
+
+    transition:opacity .18s ease;
+
+    z-index:2147483647;
+
+}
+
+.artwork-lightbox.open{
+
+    opacity:1;
+    visibility:visible;
+
+}
+
+.artwork-lightbox img{
+
+    display:block;
+
+    max-width:95vw;
+    max-height:95vh;
+
+    object-fit:contain;
+
+}
+
+.artwork-close{
+
+    position:absolute;
+
+    top:24px;
+    right:30px;
+
+    font-size:42px;
+
+    color:white;
+
+    cursor:pointer;
+
+    user-select:none;
+
+}
+
+body.artwork-lightbox-open{
+
+    overflow:hidden;
+
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width:900px){
+
+    .artwork-header{
+
+        grid-template-columns:1fr;
+
+        gap:40px;
+
+    }
+
+}
