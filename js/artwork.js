@@ -279,6 +279,7 @@ const Artwork = {
                 )
 
             ].map(anchor=>anchor.href);
+            console.log(images);
 
             if(!images.length){
 
