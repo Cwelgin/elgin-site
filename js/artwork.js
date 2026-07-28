@@ -1,21 +1,47 @@
 /*
+============================================================
+
     artwork.js
-    Shared artwork rendering library for cliffelgin.com
+    ELGIN Core v1.0.0
+    Shared artwork renderer
+
+============================================================
+
+    Responsibilities
+
+    • Read artwork metadata
+    • Build artwork layout
+    • Render metadata
+    • Load hero image
+    • Initialize lightbox
+
+============================================================
 */
 
 const Artwork = {
 
-    async init(){
+    /******************************************************
+     * ENTRY POINT
+     ******************************************************/
+
+    async initialize(){
 
         const element =
             document.querySelector(".artwork");
 
-        if(!element) return;
+        if(!element){
+
+            return;
+
+        }
 
         const artwork =
-            this.read(element);
+            this.readMetadata(element);
 
-        this.build(element, artwork);
+        this.buildLayout(
+            element,
+            artwork
+        );
 
         this.renderMetadata(
             element.querySelector(".meta"),
@@ -29,7 +55,11 @@ const Artwork = {
     },
 
 
-    read(element){
+    /******************************************************
+     * READ METADATA
+     ******************************************************/
+
+    readMetadata(element){
 
         const json =
             element.querySelector(
@@ -38,33 +68,96 @@ const Artwork = {
 
         if(!json){
 
-            return {};
+            console.error(
+                "Artwork metadata not found."
+            );
+
+            return this.defaultMetadata();
 
         }
 
+        let artwork;
+
         try{
 
-            return JSON.parse(
-                json.textContent
-            );
+            artwork =
+                JSON.parse(
+                    json.textContent
+                );
 
         }
 
         catch(error){
 
             console.error(
-                "Invalid artwork JSON",
+                "Invalid artwork metadata.",
                 error
             );
 
-            return {};
+            return this.defaultMetadata();
 
         }
+
+        return {
+
+            id:
+                artwork.id || "",
+
+            series:
+                artwork.series || "",
+
+            title:
+                artwork.title || "",
+
+            atlas:
+                artwork.atlas || "",
+
+            regime:
+                artwork.regime || "",
+
+            medium:
+                artwork.medium || "",
+
+            dimensions:
+                artwork.dimensions || "",
+
+            date:
+                artwork.date || "",
+
+            statement:
+                artwork.statement || ""
+
+        };
 
     },
 
 
-    build(element, artwork){
+    /******************************************************
+     * DEFAULT METADATA
+     ******************************************************/
+
+    defaultMetadata(){
+
+        return {
+
+            id:"",
+            series:"",
+            title:"",
+            atlas:"",
+            regime:"",
+            medium:"",
+            dimensions:"",
+            date:"",
+            statement:""
+
+        };
+
+    },
+        /******************************************************
+     * BUILD LAYOUT
+     ******************************************************/
+
+    buildLayout(element, artwork){
 
         element.innerHTML = `
 
@@ -74,14 +167,20 @@ const Artwork = {
 
     <div class="artwork-info">
 
-        <h1>${artwork.title || ""}</h1>
+        <h1>${artwork.title}</h1>
 
         <div class="meta"></div>
 
         ${
             artwork.statement
-            ? `<div class="statement">${artwork.statement}</div>`
-            : ""
+                ? `
+        <div class="statement">
+
+            ${artwork.statement}
+
+        </div>
+        `
+                : ""
         }
 
     </div>
@@ -90,7 +189,11 @@ const Artwork = {
 
 <div class="artwork-lightbox">
 
-    <div class="artwork-close">&times;</div>
+    <div class="artwork-close">
+
+        &times;
+
+    </div>
 
     <img>
 
@@ -100,6 +203,10 @@ const Artwork = {
 
     },
 
+
+    /******************************************************
+     * RENDER METADATA
+     ******************************************************/
 
     renderMetadata(container, artwork){
 
@@ -115,32 +222,46 @@ const Artwork = {
 
         fields.forEach(([key,label])=>{
 
-            if(!artwork[key]) return;
+            const value =
+                artwork[key];
+
+            if(!value){
+
+                return;
+
+            }
 
             container.insertAdjacentHTML(
 
                 "beforeend",
 
                 `
-                <p>
-                    <strong>${label}</strong>
-                    ${artwork[key]}
-                </p>
-                `
+<p>
+
+    <strong>${label}</strong>
+
+    ${value}
+
+</p>
+`
 
             );
 
         });
 
     },
-
+        /******************************************************
+     * LOAD HERO IMAGE
+     ******************************************************/
 
     async loadHeroImage(container){
 
         try{
 
             const response =
-                await fetch(window.location.pathname);
+                await fetch(
+                    window.location.pathname
+                );
 
             const html =
                 await response.text();
@@ -157,23 +278,35 @@ const Artwork = {
                     ".image-slide-anchor"
                 )
 
-            ].map(a=>a.href);
+            ].map(anchor=>anchor.href);
 
-            if(!images.length) return;
+            if(!images.length){
 
-            const src =
+                return;
+
+            }
+
+            const source =
                 images.at(-1);
 
-            const img =
-                document.createElement("img");
+            const image =
+                document.createElement(
+                    "img"
+                );
 
-            img.src = src;
+            image.src = source;
 
-            container.append(img);
+            image.loading = "eager";
 
-            this.setupLightbox(
-                img,
-                src
+            image.decoding = "async";
+
+            container.append(
+                image
+            );
+
+            this.initializeLightbox(
+                image,
+                source
             );
 
         }
@@ -181,7 +314,11 @@ const Artwork = {
         catch(error){
 
             console.error(
+
+                "Unable to load artwork image.",
+
                 error
+
             );
 
         }
@@ -189,15 +326,27 @@ const Artwork = {
     },
 
 
-    setupLightbox(image, src){
+    /******************************************************
+     * INITIALIZE LIGHTBOX
+     ******************************************************/
+
+    initializeLightbox(image,source){
 
         const overlay =
             document.querySelector(
                 ".artwork-lightbox"
             );
 
+        if(!overlay){
+
+            return;
+
+        }
+
         const large =
-            overlay.querySelector("img");
+            overlay.querySelector(
+                "img"
+            );
 
         const close = ()=>{
 
@@ -211,41 +360,62 @@ const Artwork = {
 
         };
 
-        image.onclick = ()=>{
+        image.addEventListener(
 
-            large.src = src;
+            "click",
 
-            overlay.classList.add(
-                "open"
-            );
+            ()=>{
 
-            document.body.classList.add(
-                "artwork-lightbox-open"
-            );
+                large.src = source;
 
-        };
+                overlay.classList.add(
+                    "open"
+                );
 
-        overlay.querySelector(
-            ".artwork-close"
-        ).onclick = close;
-
-        overlay.onclick = e=>{
-
-            if(e.target===overlay){
-
-                close();
+                document.body.classList.add(
+                    "artwork-lightbox-open"
+                );
 
             }
 
-        };
+        );
+
+        overlay
+            .querySelector(
+                ".artwork-close"
+            )
+            .addEventListener(
+                "click",
+                close
+            );
+
+        overlay.addEventListener(
+
+            "click",
+
+            event=>{
+
+                if(
+                    event.target === overlay
+                ){
+
+                    close();
+
+                }
+
+            }
+
+        );
 
         document.addEventListener(
 
             "keydown",
 
-            e=>{
+            event=>{
 
-                if(e.key==="Escape"){
+                if(
+                    event.key === "Escape"
+                ){
 
                     close();
 
@@ -260,10 +430,14 @@ const Artwork = {
 };
 
 
+/******************************************************
+ * STARTUP
+ ******************************************************/
+
 document.addEventListener(
 
     "DOMContentLoaded",
 
-    ()=>Artwork.init()
+    ()=>Artwork.initialize()
 
 );
