@@ -1,0 +1,101 @@
+/*
+    gallery.css
+    ELGIN Core v1.0.0
+    Shared gallery renderer
+*/
+
+
+/* ==========================================================
+   GALLERY LAYOUT
+   ========================================================== */
+
+.gallery{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fill,minmax(220px,1fr));
+
+    gap:24px;
+
+    width:100%;
+
+}
+
+
+/* ==========================================================
+   GALLERY CARD
+   ========================================================== */
+
+.etude-card{
+
+    width:100%;
+
+}
+
+.etude-card a{
+
+    display:block;
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+
+/* ==========================================================
+   THUMBNAIL
+   ========================================================== */
+
+.etude-card img{
+
+    display:block;
+
+    width:100%;
+
+    aspect-ratio:5 / 7;
+
+    object-fit:cover;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+
+}
+
+
+/* ==========================================================
+   HOVER
+   ========================================================== */
+
+.etude-card:hover img{
+
+    opacity:.96;
+
+}
+
+
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+
+@media (max-width:900px){
+
+    .gallery{
+
+        gap:18px;
+
+    }
+
+}
+
+@media (max-width:600px){
+
+    .gallery{
+
+        gap:14px;
+
+    }
+
+}
