@@ -10,7 +10,7 @@
     Responsibilities
 
     • Read artwork metadata
-    • Build artwork layout
+    • Build artwork layout 
     • Render metadata
     • Load hero image
     • Initialize lightbox
