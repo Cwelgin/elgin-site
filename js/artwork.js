@@ -5,18 +5,7 @@ const SHEET_URL =
 ============================================================
 
     artwork.js
-    ELGIN Core v2.0.0
-    Shared artwork renderer
-
-============================================================
-
-    Responsibilities
-
-    • Read artwork metadata
-    • Build artwork layout
-    • Render metadata
-    • Load hero image
-    • Initialize lightbox
+    ELGIN Core v3.0.0
 
 ============================================================
 */
@@ -27,160 +16,315 @@ const Artwork = {
      * ENTRY POINT
      ******************************************************/
 
-   async initialize(){
+    async initialize(){
 
-    const element =
-        document.querySelector(".artwork");
+        const element =
+            document.querySelector(".artwork");
 
-    if(!element){
+        if(!element) return;
 
-        return;
+        const id =
+            element.dataset.id?.trim();
 
-    }
+        if(!id){
 
-    const id =
-        element.dataset.id;
+            console.error(
+                "Artwork ID not found."
+            );
 
-    if(!id){
+            return;
 
-        console.error(
-            "Artwork ID not found."
+        }
+
+        let artwork;
+
+        try{
+
+            artwork =
+                await this.loadArtwork(id);
+
+        }
+
+        catch(error){
+
+            console.error(error);
+
+            return;
+
+        }
+
+        if(!artwork){
+
+            console.error(
+                `Artwork ${id} not found.`
+            );
+
+            return;
+
+        }
+
+        this.buildLayout(
+            element,
+            artwork
         );
 
-        return;
+        this.renderMetadata(
 
-    }
+            element.querySelector(".meta"),
 
-let artwork;
+            artwork
 
-try{
-
-    artwork =
-        await this.loadArtwork(id);
-
-}
-
-catch(error){
-
-    console.error(error);
-
-    return;
-
-}
-
-    if(!artwork){
-
-        console.error(
-            `Artwork ${id} not found.`
         );
 
-        return;
+        await this.loadHeroImage(
 
-    }
+            element.querySelector(
+                ".artwork-image"
+            )
 
-    this.buildLayout(
-        element,
-        artwork
-    );
-
-    this.renderMetadata(
-
-        element.querySelector(".meta"),
-
-        artwork
-
-    );
-
-    await this.loadHeroImage(
-
-        element.querySelector(
-            ".artwork-image"
-        )
-
-    );
-
-},
-
-async loadArtwork(id){
-
-    const response =
-        await fetch(SHEET_URL);
-
-    if(!response.ok){
-
-        throw new Error(
-            "Unable to load artwork spreadsheet."
         );
 
-    }
+    },
 
-    const csv =
-        await response.text();
 
-    const rows =
-        this.parseCSV(csv);
+    /******************************************************
+     * LOAD ARTWORK
+     ******************************************************/
 
+    async loadArtwork(id){
+
+        const response =
+            await fetch(SHEET_URL);
+
+        if(!response.ok){
+
+            throw new Error(
+                "Unable to load spreadsheet."
+            );
+
+        }
+
+        const csv =
+            await response.text();
+
+        const rows =
+            this.parseCSV(csv);
 return rows.find(
 
     artwork =>
 
+        artwork.id &&
         artwork.id.trim().toUpperCase() ===
         id.trim().toUpperCase()
 
 );
 
-},
+    },
 
 
-parseCSV(csv){
+    /******************************************************
+     * PARSE CSV
+     ******************************************************/
 
-    const lines =
-        csv.trim().split("\n");
+    parseCSV(csv){
 
-    const headers =
-        lines.shift().split(",");
+        const rows =
+            [];
 
-    return lines.map(line=>{
+        const lines =
+            csv.trim().split(/\r?\n/);
 
-        const values =
-            line.split(",");
+        const headers =
+            this.parseCSVRow(
+                lines.shift()
+            );
 
-        const artwork = {};
+        lines.forEach(line=>{
 
-        headers.forEach((header,index)=>{
+            if(!line.trim()) return;
 
-            artwork[
-                header.trim()
-            ] =
-                values[index]?.trim() || "";
+            const values =
+                this.parseCSVRow(line);
+
+            const artwork =
+                {};
+
+            headers.forEach((header,index)=>{
+
+                artwork[
+                    header.trim()
+                ] =
+                    values[index]?.trim() || "";
+
+            });
+
+            artwork.dimensions =
+
+                artwork.width &&
+                artwork.height
+
+                    ? `${artwork.width}" × ${artwork.height}"`
+
+                    : "";
+
+            artwork.date =
+                this.formatDate(
+
+                    artwork.startDate,
+
+                    artwork.endDate,
+
+                    artwork.status
+
+                );
+
+            rows.push(
+                artwork
+            );
 
         });
 
-        artwork.dimensions =
+        return rows;
 
-            artwork.width && artwork.height
+    },
 
-                ? `${artwork.width}" × ${artwork.height}"`
 
-                : "";
+    /******************************************************
+     * PARSE CSV ROW
+     ******************************************************/
 
-artwork.date =
+    parseCSVRow(row){
 
-    artwork.startDate &&
-    artwork.endDate
+        const values =
+            [];
 
-        ? `${artwork.startDate} – ${artwork.endDate}`
+        let value = "";
 
-        : artwork.startDate;
+        let quoted = false;
 
-        return artwork;
+        for(let i=0;i<row.length;i++){
 
-    });
+            const char =
+                row[i];
+
+            if(char === '"'){
+
+                if(
+
+                    quoted &&
+                    row[i+1] === '"'
+
+                ){
+
+                    value += '"';
+
+                    i++;
+
+                }
+
+                else{
+
+                    quoted = !quoted;
+
+                }
+
+            }
+
+            else if(
+
+                char === "," &&
+                !quoted
+
+            ){
+
+                values.push(
+                    value
+                );
+
+                value = "";
+
+            }
+
+            else{
+
+                value += char;
+
+            }
+
+        }
+
+        values.push(
+            value
+        );
+
+        return values;
+
+    },
+
+
+    /******************************************************
+     * FORMAT DATE
+     ******************************************************/
+
+    formatDate(start,end,status){
+
+    if(!start) return "";
+
+    const months=[
+
+        "January","February","March","April",
+        "May","June","July","August",
+        "September","October","November","December"
+
+    ];
+
+    const parse=value=>{
+
+        const [year,month]=value.split("-");
+
+        return{
+
+            year,
+
+            month:Number(month),
+
+            name:months[Number(month)-1]
+
+        };
+
+    };
+
+    const s=parse(start);
+
+    if(status==="In Progress" || !end){
+
+        return `${s.name} ${s.year}`;
+
+    }
+
+    const e=parse(end);
+
+    if(
+        s.year===e.year &&
+        s.month===e.month
+    ){
+
+        return `${s.name} ${s.year}`;
+
+    }
+
+    if(
+        s.year===e.year
+    ){
+
+        return `${s.name}–${e.name} ${s.year}`;
+
+    }
+
+    return `${s.name} ${s.year} – ${e.name} ${e.year}`;
 
 },
-    
-
-/******************************************************
+     /******************************************************
      * BUILD LAYOUT
      ******************************************************/
 
@@ -198,7 +342,6 @@ artwork.date =
 
         <div class="meta"></div>
 
-        
     </div>
 
 </div>
@@ -246,11 +389,12 @@ artwork.date =
 
         const fields = [
 
-            ["atlas","Atlas"],
-            ["regime","Régime"],
-            ["medium","Medium"],
-            ["dimensions","Dimensions"],
-            ["date","Date"]
+            ["atlas","ATLAS"],
+            ["regime","RÉGIME"],
+            ["medium","MEDIUM"],
+            ["dimensions","DIMENSIONS"],
+            ["date","DATE"],
+            ["status","STATUS"]
 
         ];
 
@@ -259,11 +403,15 @@ artwork.date =
             const value =
                 artwork[key];
 
-            if(!value){
+            if(!value) return;
 
-                return;
+            const display =
 
-            }
+                key === "status"
+
+                    ? `<span class="status ${value.toLowerCase().replace(/\s+/g,"-")}">${value}</span>`
+
+                    : value;
 
             container.insertAdjacentHTML(
 
@@ -271,13 +419,21 @@ artwork.date =
 
                 `
 
-<p>
+<div class="meta-row">
 
-    <strong>${label}</strong>
+    <div class="meta-label">
 
-    ${value}
+        ${label}
 
-</p>
+    </div>
+
+    <div class="meta-value">
+
+        ${display}
+
+    </div>
+
+</div>
 
 `
 
@@ -287,7 +443,8 @@ artwork.date =
 
     },
 
-/******************************************************
+
+    /******************************************************
      * LOAD HERO IMAGE
      ******************************************************/
 
@@ -300,6 +457,14 @@ artwork.date =
                     window.location.pathname
                 );
 
+            if(!response.ok){
+
+                throw new Error(
+                    "Unable to load page."
+                );
+
+            }
+
             const html =
                 await response.text();
 
@@ -309,18 +474,22 @@ artwork.date =
                     "text/html"
                 );
 
-            const images = [
+            const images =
 
-                ...doc.querySelectorAll(
-                    ".image-slide-anchor"
-                )
+                [
+                    ...doc.querySelectorAll(
+                        ".image-slide-anchor"
+                    )
+                ].map(
 
-            ].map(anchor=>anchor.href);
+                    image=>image.href
+
+                );
 
             if(!images.length){
 
                 console.warn(
-                    "No gallery image found."
+                    "No gallery images found."
                 );
 
                 return;
@@ -330,57 +499,52 @@ artwork.date =
             const source =
                 images.at(-1);
 
-            const image =
+            const img =
                 document.createElement(
                     "img"
                 );
 
-            image.src = source;
+            img.src = source;
 
-            image.loading = "eager";
+            img.loading = "eager";
 
-            image.decoding = "async";
+            img.decoding = "async";
 
             container.append(
-                image
+                img
             );
 
             this.initializeLightbox(
-                image,
+
+                img,
+
                 source
+
             );
 
         }
 
         catch(error){
 
-            console.error(
-
-                "Unable to load artwork image.",
-
-                error
-
-            );
+            console.error(error);
 
         }
 
     },
-/******************************************************
-     * INITIALIZE LIGHTBOX
+
+
+    /******************************************************
+     * LIGHTBOX
      ******************************************************/
 
-    initializeLightbox(image, source){
+    initializeLightbox(image,source){
 
         const overlay =
             document.querySelector(
                 ".artwork-lightbox"
             );
 
-        if(!overlay){
-
-            return;
-
-        }
+        if(!overlay) return;
 
         const large =
             overlay.querySelector(
@@ -399,7 +563,12 @@ artwork.date =
 
         };
 
-        if(!overlay.dataset.initialized){
+        if(
+            !overlay.dataset.initialized
+        ){
+
+            overlay.dataset.initialized =
+                "true";
 
             overlay
                 .querySelector(
@@ -417,7 +586,7 @@ artwork.date =
                 event=>{
 
                     if(
-                        event.target === overlay
+                        event.target===overlay
                     ){
 
                         close();
@@ -435,7 +604,7 @@ artwork.date =
                 event=>{
 
                     if(
-                        event.key === "Escape"
+                        event.key==="Escape"
                     ){
 
                         close();
@@ -446,9 +615,6 @@ artwork.date =
 
             );
 
-            overlay.dataset.initialized =
-                "true";
-
         }
 
         image.addEventListener(
@@ -457,7 +623,8 @@ artwork.date =
 
             ()=>{
 
-                large.src = source;
+                large.src =
+                    source;
 
                 overlay.classList.add(
                     "open"
@@ -486,4 +653,6 @@ document.addEventListener(
 
     ()=>Artwork.initialize()
 
-);
+);   
+    
+    
