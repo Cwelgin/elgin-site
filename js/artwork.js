@@ -265,12 +265,13 @@ return rows.find(
     /******************************************************
      * FORMAT DATE
      ******************************************************/
+/******************************************************
+ * FORMAT DATE
+ ******************************************************/
 
-    formatDate(start,end,status){
+formatDate(start,end){
 
-    if(!start) return "";
-
-    const months=[
+    const months = [
 
         "January","February","March","April",
         "May","June","July","August",
@@ -278,52 +279,33 @@ return rows.find(
 
     ];
 
-    const parse=value=>{
+    const format = value=>{
 
-        const [year,month]=value.split("-");
+        if(!value){
 
-        return{
+            return "";
 
-            year,
+        }
 
-            month:Number(month),
+        const [year,month] = value.split("-");
 
-            name:months[Number(month)-1]
-
-        };
+        return `${months[Number(month)-1]} ${year}`;
 
     };
 
-    const s=parse(start);
+    const startText = format(start);
+    const endText   = format(end);
 
-    if(status==="In Progress" || !end){
+    if(startText && endText){
 
-        return `${s.name} ${s.year}`;
-
-    }
-
-    const e=parse(end);
-
-    if(
-        s.year===e.year &&
-        s.month===e.month
-    ){
-
-        return `${s.name} ${s.year}`;
+        return `${startText} – ${endText}`;
 
     }
 
-    if(
-        s.year===e.year
-    ){
-
-        return `${s.name}–${e.name} ${s.year}`;
-
-    }
-
-    return `${s.name} ${s.year} – ${e.name} ${e.year}`;
+    return startText || endText;
 
 },
+
      /******************************************************
      * BUILD LAYOUT
      ******************************************************/
