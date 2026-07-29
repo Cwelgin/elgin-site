@@ -103,15 +103,15 @@ h1[data-animation-role="header-element"]{
 
 .artwork-info{
 
-    line-height:1.6;
+    line-height:1.4;
 
 }
 
 .artwork-info h1{
 
-    margin:0 0 34px;
+    margin:0 0 42px;
 
-    font-size:2.6rem;
+    font-size:3rem;
 
     font-weight:500;
 
@@ -121,41 +121,93 @@ h1[data-animation-role="header-element"]{
 
 }
 
-.artwork-info .meta{
+.meta{
 
-    color:#666;
+    display:flex;
 
-    font-size:1rem;
+    flex-direction:column;
 
-}
-
-.artwork-info .meta p{
-
-    margin:0 0 18px;
+    gap:0;
 
 }
 
-.artwork-info .meta strong{
+.meta-row{
 
-    display:block;
+    display:grid;
 
-    color:#222;
+    grid-template-columns:110px 1fr;
+
+    align-items:center;
+
+    padding:14px 0;
+
+    border-bottom:1px solid #ece7e2;
+
+}
+
+.meta-row:last-child{
+
+    border-bottom:none;
+
+}
+
+.meta-label{
+
+    font-size:.78rem;
+
+    letter-spacing:.18em;
+
+    text-transform:uppercase;
+
+    color:#888;
 
     font-weight:600;
 
-    margin-bottom:2px;
-
 }
 
-.artwork-info .statement{
+.meta-value{
 
-    margin-top:40px;
+    font-size:1.05rem;
 
     color:#222;
 
-    line-height:1.8;
+}
 
-    font-size:1.05rem;
+.status{
+
+    display:inline-block;
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:.82rem;
+
+    font-weight:600;
+
+}
+
+.status.in-progress{
+
+    background:#efe9dc;
+
+    color:#7a5d2c;
+
+}
+
+.status.available{
+
+    background:#e6f4ea;
+
+    color:#2b6b45;
+
+}
+
+.status.sold{
+
+    background:#f6e2e2;
+
+    color:#8b2b2b;
 
 }
 
