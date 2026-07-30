@@ -43,24 +43,14 @@ h1[data-animation-role="header-element"]{
    ========================================================== */
 
 .artwork-header{
-
     display:grid;
-
-    grid-template-columns:
-        minmax(320px,600px)
-        340px;
-
-    gap:80px;
-
+    grid-template-columns:minmax(320px,600px) 340px;
+    gap:56px;
     justify-content:center;
     align-items:start;
-
     max-width:1100px;
-
-    margin:0 auto 40px;
-
+    margin:0 auto 20px;
 }
-
 
 /* ==========================================================
    HERO IMAGE
@@ -132,17 +122,11 @@ h1[data-animation-role="header-element"]{
 }
 
 .meta-row{
-
     display:grid;
-
-    grid-template-columns:110px 1fr;
-
+    grid-template-columns:116px 1fr;
     align-items:center;
-
     padding:14px 0;
-
     border-bottom:1px solid #ece7e2;
-
 }
 
 .meta-row:last-child{
