@@ -268,20 +268,18 @@ return rows.find(
 
 formatDate(start,end){
 
-const months = [
+    const months = [
 
-    "Jan","Feb","Mar","Apr",
-    "May","Jun","Jul","Aug",
-    "Sep","Oct","Nov","Dec"
+        "Jan","Feb","Mar","Apr",
+        "May","Jun","Jul","Aug",
+        "Sep","Oct","Nov","Dec"
 
-];
+    ];
 
     const format = value=>{
 
         if(!value){
-
             return "";
-
         }
 
         const [year,month] = value.split("-");
@@ -289,19 +287,19 @@ const months = [
         return `${months[Number(month)-1]} ${year}`;
 
     };
+const startText = format(start);
+const endText   = format(end);
 
-    const startText = format(start);
-    const endText   = format(end);
+return [
+    startText,
+    "–",
+    endText
+].join(" ");
 
-    if(startText && endText){
-
-        return `${startText} – ${endText}`;
-
-    }
-
-    return startText || endText;
 
 },
+
+
 
      /******************************************************
      * BUILD LAYOUT
