@@ -166,15 +166,17 @@ h1[data-animation-role="header-element"]{
     line-height:1.45;
 
 }
+
 .artist-updated{
 
-    margin-top:60px;
+    margin-top:48px;
 
-    font-size:.9rem;
+    font-size:.75rem;
 
     color:#888;
 
-    font-style:italic;
+    line-height:1.5;
+        font-style:italic;
 
 }
 
