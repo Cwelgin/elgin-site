@@ -6,9 +6,8 @@
 
 ============================================================
 */
-
 const SHEET_URL =
-"https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_SHEET/pub?gid=YOUR_ARTISTS_GID&single=true&output=csv";
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vRVojs1qLtfQIp7KKv8Zdjz7f7ZmUAh1AEKa521ddmeaBjsSmFsIjtwvu5GRCX1anqcpLrXGbRf_POy/pub?gid=1815563271&single=true&output=csv";
 
 const Artist = {
 
