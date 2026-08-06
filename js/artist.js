@@ -2,14 +2,19 @@
 ============================================================
 
     artist.js
-    ELGIN Core v1.0.0
+    ELGIN Core v1.1.0
 
 ============================================================
 */
+
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVojs1qLtfQIp7KKv8Zdjz7f7ZmUAh1AEKa521ddmeaBjsSmFsIjtwvu5GRCX1anqcpLrXGbRf_POy/pub?gid=1815563271&single=true&output=csv";
 
 const Artist = {
+
+    /******************************************************
+     * ENTRY POINT
+     ******************************************************/
 
     async initialize(){
 
@@ -23,7 +28,9 @@ const Artist = {
 
         if(!id){
 
-            console.error("Artist ID not found.");
+            console.error(
+                "Artist ID not found."
+            );
 
             return;
 
@@ -58,6 +65,11 @@ const Artist = {
 
     },
 
+
+    /******************************************************
+     * LOAD ARTIST
+     ******************************************************/
+
     async loadArtist(id){
 
         const response =
@@ -66,7 +78,7 @@ const Artist = {
         if(!response.ok){
 
             throw new Error(
-                "Unable to load artist spreadsheet."
+                `Unable to load artist spreadsheet. HTTP ${response.status}`
             );
 
         }
@@ -81,11 +93,17 @@ const Artist = {
 
             artist =>
 
-                artist.id.toUpperCase() === id
+                artist.id &&
+                artist.id.trim().toUpperCase() === id
 
         );
 
     },
+
+
+    /******************************************************
+     * PARSE CSV
+     ******************************************************/
 
     parseCSV(csv){
 
@@ -127,6 +145,11 @@ const Artist = {
 
     },
 
+
+    /******************************************************
+     * PARSE CSV ROW
+     ******************************************************/
+
     parseCSVRow(row){
 
         const values = [];
@@ -166,7 +189,9 @@ const Artist = {
                 !quoted
             ){
 
-                values.push(value);
+                values.push(
+                    value
+                );
 
                 value = "";
 
@@ -180,11 +205,51 @@ const Artist = {
 
         }
 
-        values.push(value);
+        values.push(
+            value
+        );
 
         return values;
 
     },
+
+
+    /******************************************************
+     * FORMAT DATE
+     ******************************************************/
+
+    formatDate(date){
+
+        if(!date) return "";
+
+        const months = [
+
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+
+        ];
+
+        const [year,month] =
+            date.split("-");
+
+        return `${months[Number(month)-1]} ${year}`;
+
+    },
+
+
+    /******************************************************
+     * BUILD PAGE
+     ******************************************************/
 
     buildLayout(element,artist){
 
@@ -216,9 +281,13 @@ const Artist = {
 
         </h1>
 
-        <div class="meta">
+        <div class="artist-years">
 
-            ${this.row("Life",life)}
+            ${life}
+
+        </div>
+
+        <div class="meta">
 
             ${this.row("Nationality",artist.nationality)}
 
@@ -228,8 +297,6 @@ const Artist = {
 
             ${this.row("Period",artist.period)}
 
-            ${this.row("Updated",artist.updated)}
-
         </div>
 
     </div>
@@ -238,13 +305,28 @@ const Artist = {
 
 <div class="artist-blurb">
 
-${artist.blurb}
+    ${artist.blurb}
+
+</div>
+
+<div class="artist-updated">
+
+    Last revised
+
+    <br>
+
+    ${this.formatDate(artist.updated)}
 
 </div>
 
 `;
 
     },
+
+
+    /******************************************************
+     * METADATA ROW
+     ******************************************************/
 
     row(label,value){
 
@@ -274,6 +356,11 @@ ${artist.blurb}
 
 };
 
+
+/******************************************************
+ * STARTUP
+ ******************************************************/
+
 document.addEventListener(
 
     "DOMContentLoaded",
@@ -281,5 +368,3 @@ document.addEventListener(
     ()=>Artist.initialize()
 
 );
-    
-    
