@@ -232,12 +232,11 @@ formatDate(date){
         "en-US",
         {
             year: "numeric",
-            day: "numeric"
+            month: "long"
         }
     );
 
 },
-
 
 
     /******************************************************
