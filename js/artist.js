@@ -300,10 +300,15 @@ const Artist = {
                 artist.period
             )}
 
+            ${this.row(
+                "Last revised",
+                this.formatDate(
+                    artist.updated
+                )
+            )}
+
         </div>
-<p class="artist-updated">
-    Last updated ${this.formatDate(artist.updated)}.
-</p>
+
     </div>
 
 </div>
@@ -338,16 +343,10 @@ const Artist = {
     </div>
 
 </div>
-<p class="artist-updated">
-
-    Last updated ${this.formatDate(artist.updated)}.
-
-</p>
 
 `;
 
     }
-    
 
 };
 
