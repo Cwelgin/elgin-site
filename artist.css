@@ -1,9 +1,8 @@
-
 /*
 ==========================================================
 
     artist.css
-    ELGIN Core v1.0.0
+    ELGIN Core v1.1.0
 
 ==========================================================
 */
@@ -44,14 +43,14 @@ h1[data-animation-role="header-element"]{
 
 
 /* ==========================================================
-   LAYOUT
+   MAIN LAYOUT
    ========================================================== */
 
 .artist{
 
     max-width:1200px;
 
-    margin:90px auto;
+    margin:80px auto;
 
     padding:0 30px;
 
@@ -61,11 +60,9 @@ h1[data-animation-role="header-element"]{
 
     display:grid;
 
-    grid-template-columns:minmax(420px,600px) 360px;
+    grid-template-columns:minmax(450px,650px) 340px;
 
     gap:70px;
-
-    justify-content:center;
 
     align-items:start;
 
@@ -81,8 +78,6 @@ h1[data-animation-role="header-element"]{
     display:flex;
 
     justify-content:center;
-
-    align-items:flex-start;
 
 }
 
@@ -100,7 +95,7 @@ h1[data-animation-role="header-element"]{
 
 
 /* ==========================================================
-   INFO
+   INFO PANEL
    ========================================================== */
 
 .artist-info{
@@ -113,15 +108,34 @@ h1[data-animation-role="header-element"]{
 
 .artist-info h1{
 
-    margin:0 0 40px;
+    margin:0;
 
-    font-size:2.3rem;
+    font-size:2.15rem;
 
     font-weight:500;
 
-    letter-spacing:.05em;
+    letter-spacing:.04em;
 
     text-transform:uppercase;
+
+    line-height:1.15;
+
+}
+
+
+/* ==========================================================
+   YEARS
+   ========================================================== */
+
+.artist-years{
+
+    margin:10px 0 42px;
+
+    font-size:1rem;
+
+    color:#777;
+
+    letter-spacing:.03em;
 
 }
 
@@ -142,11 +156,11 @@ h1[data-animation-role="header-element"]{
 
     display:grid;
 
-    grid-template-columns:130px 1fr;
+    grid-template-columns:120px 1fr;
 
-    align-items:center;
+    gap:20px;
 
-    padding:18px 0;
+    padding:15px 0;
 
     border-bottom:1px solid #ece7e2;
 
@@ -160,11 +174,11 @@ h1[data-animation-role="header-element"]{
 
 .meta-label{
 
-    font-size:.78rem;
+    font-size:.76rem;
 
     font-weight:600;
 
-    letter-spacing:.20em;
+    letter-spacing:.18em;
 
     text-transform:uppercase;
 
@@ -174,9 +188,11 @@ h1[data-animation-role="header-element"]{
 
 .meta-value{
 
-    font-size:1rem;
+    font-size:.96rem;
 
     color:#222;
+
+    line-height:1.45;
 
 }
 
@@ -189,11 +205,11 @@ h1[data-animation-role="header-element"]{
 
     max-width:760px;
 
-    margin:70px 0 0;
+    margin-top:70px;
 
     font-size:1.08rem;
 
-    line-height:1.85;
+    line-height:1.9;
 
     color:#222;
 
@@ -201,7 +217,26 @@ h1[data-animation-role="header-element"]{
 
 .artist-blurb p{
 
-    margin:0 0 1.4em;
+    margin:0 0 1.5em;
+
+}
+
+
+/* ==========================================================
+   LAST REVISED
+   ========================================================== */
+
+.artist-updated{
+
+    margin-top:70px;
+
+    font-size:.82rem;
+
+    color:#999;
+
+    letter-spacing:.03em;
+
+    line-height:1.7;
 
 }
 
@@ -229,7 +264,7 @@ h1[data-animation-role="header-element"]{
 
     .artist{
 
-        margin:50px auto;
+        margin:40px auto;
 
         padding:0 20px;
 
@@ -251,19 +286,31 @@ h1[data-animation-role="header-element"]{
 
     .artist-info h1{
 
-        font-size:2rem;
+        font-size:1.8rem;
+
+    }
+
+    .artist-years{
+
+        margin:8px 0 30px;
 
     }
 
     .meta-row{
 
-        grid-template-columns:110px 1fr;
+        grid-template-columns:105px 1fr;
 
     }
 
     .artist-blurb{
 
-        margin-top:40px;
+        margin-top:45px;
+
+    }
+
+    .artist-updated{
+
+        margin-top:50px;
 
     }
 
