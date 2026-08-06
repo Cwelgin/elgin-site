@@ -238,92 +238,90 @@ const Artist = {
     },
 
 
-    /******************************************************
-     * BUILD PAGE
-     ******************************************************/
+/******************************************************
+ * BUILD PAGE
+ ******************************************************/
 
-    buildLayout(element,artist){
+buildLayout(element,artist){
 
-        const years =
+    const years =
 
-            artist.died
+        artist.died
 
-            ? `${artist.born}–${artist.died}`
+        ? `${artist.born}–${artist.died}`
 
-            : `${artist.born}–`;
+        : `${artist.born}–`;
 
-        element.innerHTML = `
+    element.innerHTML = `
 
-<div class="artist-header">
+<div class="artist-image">
 
-    <div class="artist-image">
+    <img
+        src="${artist.image}"
+        alt="${artist.name}">
 
-        <img
-            src="${artist.image}"
-            alt="${artist.name}">
+</div>
+
+<div class="artist-info">
+
+    <h1>
+
+        ${artist.name}
+
+    </h1>
+
+    <div class="artist-years">
+
+        ${years}
 
     </div>
 
-    <div class="artist-info">
+    <div class="meta">
 
-        <h1>
+        ${this.row(
+            "Nationality",
+            artist.nationality
+        )}
 
-            ${artist.name}
+        ${this.row(
+            "Movement",
+            artist.movement
+        )}
 
-        </h1>
+        ${this.row(
+            "Genre",
+            artist.genre
+        )}
 
-        <div class="artist-years">
+        ${this.row(
+            "Period",
+            artist.period
+        )}
 
-            ${years}
+    </div>
 
-        </div>
+    <p class="artist-updated">
 
-        <div class="meta">
-
-            ${this.row(
-                "Nationality",
-                artist.nationality
-            )}
-
-            ${this.row(
-                "Movement",
-                artist.movement
-            )}
-
-            ${this.row(
-                "Genre",
-                artist.genre
-            )}
-
-            ${this.row(
-                "Period",
-                artist.period
-            )}
-
-        </div>
-
-        <p class="artist-updated">
         Last updated ${this.formatDate(artist.updated)}.
-        </p>
 
-    </div>
+    </p>
 
 </div>
 
 `;
 
-    },
+},
 
 
-    /******************************************************
-     * METADATA ROW
-     ******************************************************/
+/******************************************************
+ * METADATA ROW
+ ******************************************************/
 
-    row(label,value){
+row(label,value){
 
-        if(!value) return "";
+    if(!value) return "";
 
-        return `
+    return `
 
 <div class="meta-row">
 
@@ -343,10 +341,7 @@ const Artist = {
 
 `;
 
-    }
-
-};
-
+}
 
 /******************************************************
  * STARTUP
