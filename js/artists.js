@@ -216,43 +216,28 @@ const Artist = {
 
     },
 
-        /******************************************************
-     * FORMAT DATE
-     ******************************************************/
+/******************************************************
+ * FORMAT DATE
+ ******************************************************/
 
-    formatDate(date){
+formatDate(date){
 
-        if(!date) return "";
+    if(!date) return "";
 
-        const months = [
+    const d = new Date(date);
 
-            "January",
-            "February",
-            "March",
-            "April",
-            "May",
-            "June",
-            "July",
-            "August",
-            "September",
-            "October",
-            "November",
-            "December"
+    if(isNaN(d)) return date;
 
-        ];
-
-        const parts =
-            date.split("-");
-
-        if(parts.length !== 2){
-
-            return date;
-
+    return d.toLocaleDateString(
+        "en-US",
+        {
+            year: "numeric",
+            month: "long",
+            day: "numeric"
         }
+    );
 
-        return `${months[Number(parts[1])-1]} ${parts[0]}`;
-
-    },
+},
 
 
 
