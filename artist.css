@@ -166,7 +166,17 @@ h1[data-animation-role="header-element"]{
     line-height:1.45;
 
 }
+.artist-updated{
 
+    margin-top:60px;
+
+    font-size:.9rem;
+
+    color:#888;
+
+    font-style:italic;
+
+}
 
 /* ==========================================================
    MOBILE
