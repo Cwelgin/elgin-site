@@ -2,14 +2,14 @@
 ==========================================================
 
     artist.css
-    ELGIN Core v1.1.0
+    ELGIN Core v1.2.0
 
 ==========================================================
 */
 
 
 /* ==========================================================
-   HIDE SQUARESPACE PAGE TITLE
+   HIDE SQUARESPACE TITLE
    ========================================================== */
 
 .blog-item-title,
@@ -24,35 +24,12 @@ h1[data-animation-role="header-element"]{
 
 
 /* ==========================================================
-   PAGE WIDTH
-   ========================================================== */
-
-@media screen and (min-width:768px){
-
-    .tweak-blog-item-width-narrow
-    .blog-item-wrapper
-    .blog-item-inner-wrapper{
-
-        width:100% !important;
-        max-width:1200px !important;
-        margin:0 auto !important;
-
-    }
-
-}
-
-
-/* ==========================================================
-   MAIN LAYOUT
+   HEADER
    ========================================================== */
 
 .artist{
 
-    max-width:1200px;
-
-    margin:8px auto;
-
-    padding:0 30px;
+    margin:40px 0 70px;
 
 }
 
@@ -60,11 +37,11 @@ h1[data-animation-role="header-element"]{
 
     display:grid;
 
-    grid-template-columns:700px 340px;
+    grid-template-columns:40% 60%;
 
-    gap:60px;
+    gap:48px;
 
-    justify-content:center;
+    align-items:start;
 
 }
 
@@ -75,9 +52,7 @@ h1[data-animation-role="header-element"]{
 
 .artist-image{
 
-    display:flex;
-
-    justify-content:center;
+    width:100%;
 
 }
 
@@ -85,27 +60,22 @@ h1[data-animation-role="header-element"]{
 
     display:block;
 
-    width:auto;
+    width:100%;
 
     max-width:100%;
 
-    max-height:700px;
-
     height:auto;
-
-    object-fit:contain;
 
 }
 
+
 /* ==========================================================
-   INFO PANEL
+   INFO
    ========================================================== */
 
 .artist-info{
 
-    position:sticky;
-
-    top:120px;
+    width:100%;
 
 }
 
@@ -113,7 +83,7 @@ h1[data-animation-role="header-element"]{
 
     margin:0;
 
-    font-size:2.15rem;
+    font-size:2rem;
 
     font-weight:500;
 
@@ -132,7 +102,7 @@ h1[data-animation-role="header-element"]{
 
 .artist-years{
 
-    margin:10px 0 42px;
+    margin:8px 0 34px;
 
     font-size:1rem;
 
@@ -159,25 +129,19 @@ h1[data-animation-role="header-element"]{
 
     display:grid;
 
-    grid-template-columns:120px 1fr;
+    grid-template-columns:140px 1fr;
 
-    gap:20px;
+    gap:16px;
 
-    padding:15px 0;
+    padding:14px 0;
 
     border-bottom:1px solid #ece7e2;
 
 }
 
-.meta-row:last-child{
-
-    border-bottom:none;
-
-}
-
 .meta-label{
 
-    font-size:.76rem;
+    font-size:.75rem;
 
     font-weight:600;
 
@@ -191,7 +155,7 @@ h1[data-animation-role="header-element"]{
 
 .meta-value{
 
-    font-size:.96rem;
+    font-size:.95rem;
 
     color:#222;
 
@@ -199,62 +163,9 @@ h1[data-animation-role="header-element"]{
 
 }
 
+.meta-row:last-child{
 
-/* ==========================================================
-   BIOGRAPHY
-   ========================================================== */
-
-.artist-blurb{
-
-    max-width:760px;
-
-    margin-top:70px;
-
-    font-size:1.08rem;
-
-    line-height:1.9;
-
-    color:#222;
-
-}
-
-.artist-blurb p{
-
-    margin:0 0 1.5em;
-
-}
-
-
-/* ==========================================================
-   LAST REVISED
-   ========================================================== */
-
-.artist-updated{
-
-    margin-top:70px;
-
-    font-size:.82rem;
-
-    color:#999;
-
-    letter-spacing:.03em;
-
-    line-height:1.7;
-
-}
-
-
-/* ==========================================================
-   LINKS
-   ========================================================== */
-
-.artist a{
-
-    color:inherit;
-
-    text-decoration:underline;
-
-    text-underline-offset:3px;
+    border-bottom:none;
 
 }
 
@@ -267,9 +178,7 @@ h1[data-animation-role="header-element"]{
 
     .artist{
 
-        margin:40px auto;
-
-        padding:0 20px;
+        margin:30px 0 50px;
 
     }
 
@@ -277,13 +186,7 @@ h1[data-animation-role="header-element"]{
 
         grid-template-columns:1fr;
 
-        gap:40px;
-
-    }
-
-    .artist-info{
-
-        position:static;
+        gap:36px;
 
     }
 
@@ -293,27 +196,9 @@ h1[data-animation-role="header-element"]{
 
     }
 
-    .artist-years{
-
-        margin:8px 0 30px;
-
-    }
-
     .meta-row{
 
-        grid-template-columns:105px 1fr;
-
-    }
-
-    .artist-blurb{
-
-        margin-top:45px;
-
-    }
-
-    .artist-updated{
-
-        margin-top:50px;
+        grid-template-columns:120px 1fr;
 
     }
 
