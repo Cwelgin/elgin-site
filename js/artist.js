@@ -2,7 +2,7 @@
 ============================================================
 
     artist.js
-    ELGIN Core v1.1.0
+    ELGIN Core v1.2.0
 
 ============================================================
 */
@@ -28,9 +28,7 @@ const Artist = {
 
         if(!id){
 
-            console.error(
-                "Artist ID not found."
-            );
+            console.error("Artist ID not found.");
 
             return;
 
@@ -135,9 +133,7 @@ const Artist = {
 
             });
 
-            rows.push(
-                artist
-            );
+            rows.push(artist);
 
         });
 
@@ -160,8 +156,7 @@ const Artist = {
 
         for(let i=0;i<row.length;i++){
 
-            const char =
-                row[i];
+            const char = row[i];
 
             if(char === '"'){
 
@@ -189,9 +184,7 @@ const Artist = {
                 !quoted
             ){
 
-                values.push(
-                    value
-                );
+                values.push(value);
 
                 value = "";
 
@@ -205,9 +198,7 @@ const Artist = {
 
         }
 
-        values.push(
-            value
-        );
+        values.push(value);
 
         return values;
 
@@ -253,7 +244,7 @@ const Artist = {
 
     buildLayout(element,artist){
 
-        const life =
+        const years =
 
             artist.died
 
@@ -283,34 +274,42 @@ const Artist = {
 
         <div class="artist-years">
 
-            ${life}
+            ${years}
 
         </div>
 
         <div class="meta">
 
-            ${this.row("Nationality",artist.nationality)}
+            ${this.row(
+                "Nationality",
+                artist.nationality
+            )}
 
-            ${this.row("Movement",artist.movement)}
+            ${this.row(
+                "Movement",
+                artist.movement
+            )}
 
-            ${this.row("Genre",artist.genre)}
+            ${this.row(
+                "Genre",
+                artist.genre
+            )}
 
-            ${this.row("Period",artist.period)}
+            ${this.row(
+                "Period",
+                artist.period
+            )}
+
+            ${this.row(
+                "Last revised",
+                this.formatDate(
+                    artist.updated
+                )
+            )}
 
         </div>
 
     </div>
-
-</div>
-
-
-<div class="artist-updated">
-
-    Last revised
-
-    <br>
-
-    ${this.formatDate(artist.updated)}
 
 </div>
 
