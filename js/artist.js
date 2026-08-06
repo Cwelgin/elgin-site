@@ -2,7 +2,7 @@
 ============================================================
 
     artist.js
-    ELGIN Core v1.2.0
+    ELGIN Core v3.0
 
 ============================================================
 */
@@ -24,11 +24,15 @@ const Artist = {
         if(!element) return;
 
         const id =
-            element.dataset.id?.trim().toUpperCase();
+            element.dataset.id
+                ?.trim()
+                .toUpperCase();
 
         if(!id){
 
-            console.error("Artist ID not found.");
+            console.error(
+                "Artist ID not found."
+            );
 
             return;
 
@@ -59,9 +63,13 @@ const Artist = {
 
             console.error(error);
 
+            element.innerHTML =
+                "<p>Unable to load artist.</p>";
+
         }
 
     },
+
 
 
     /******************************************************
@@ -76,7 +84,7 @@ const Artist = {
         if(!response.ok){
 
             throw new Error(
-                `Unable to load artist spreadsheet. HTTP ${response.status}`
+                `Unable to load spreadsheet (${response.status})`
             );
 
         }
@@ -84,10 +92,10 @@ const Artist = {
         const csv =
             await response.text();
 
-        const rows =
+        const artists =
             this.parseCSV(csv);
 
-        return rows.find(
+        return artists.find(
 
             artist =>
 
@@ -97,6 +105,7 @@ const Artist = {
         );
 
     },
+
 
 
     /******************************************************
@@ -129,7 +138,9 @@ const Artist = {
                 artist[
                     header.trim()
                 ] =
-                    values[index]?.trim() || "";
+                    values[index]
+                        ? values[index].trim()
+                        : "";
 
             });
 
@@ -140,6 +151,7 @@ const Artist = {
         return rows;
 
     },
+
 
 
     /******************************************************
@@ -204,8 +216,7 @@ const Artist = {
 
     },
 
-
-    /******************************************************
+        /******************************************************
      * FORMAT DATE
      ******************************************************/
 
@@ -230,98 +241,108 @@ const Artist = {
 
         ];
 
-        const [year,month] =
+        const parts =
             date.split("-");
 
-        return `${months[Number(month)-1]} ${year}`;
+        if(parts.length !== 2){
+
+            return date;
+
+        }
+
+        return `${months[Number(parts[1])-1]} ${parts[0]}`;
 
     },
 
 
-/******************************************************
- * BUILD PAGE
- ******************************************************/
 
-buildLayout(element,artist){
+    /******************************************************
+     * BUILD PAGE
+     ******************************************************/
 
-    const years =
+    buildLayout(element,artist){
 
-        artist.died
+        const years =
 
-        ? `${artist.born}–${artist.died}`
+            artist.died
 
-        : `${artist.born}–`;
+                ? `${artist.born}–${artist.died}`
 
-    element.innerHTML = `
+                : `${artist.born}–`;
 
-<div class="artist-image">
+        element.innerHTML = `
 
-    <img
-        src="${artist.image}"
-        alt="${artist.name}">
+<div class="artist-header">
 
-</div>
+    <div class="artist-image">
 
-<div class="artist-info">
-
-    <h1>
-
-        ${artist.name}
-
-    </h1>
-
-    <div class="artist-years">
-
-        ${years}
+        <img
+            src="${artist.image}"
+            alt="${artist.name}">
 
     </div>
 
-    <div class="meta">
+    <div class="artist-info">
 
-        ${this.row(
-            "Nationality",
-            artist.nationality
-        )}
+        <h1>
 
-        ${this.row(
-            "Movement",
-            artist.movement
-        )}
+            ${artist.name}
 
-        ${this.row(
-            "Genre",
-            artist.genre
-        )}
+        </h1>
 
-        ${this.row(
-            "Period",
-            artist.period
-        )}
+        <div class="artist-years">
+
+            ${years}
+
+        </div>
+
+        <div class="meta">
+
+            ${this.row(
+                "Nationality",
+                artist.nationality
+            )}
+
+            ${this.row(
+                "Movement",
+                artist.movement
+            )}
+
+            ${this.row(
+                "Genre",
+                artist.genre
+            )}
+
+            ${this.row(
+                "Period",
+                artist.period
+            )}
+
+        </div>
+
+        <p class="artist-updated">
+
+            Last updated ${this.formatDate(artist.updated)}.
+
+        </p>
 
     </div>
-
-    <p class="artist-updated">
-
-        Last updated ${this.formatDate(artist.updated)}.
-
-    </p>
 
 </div>
 
 `;
 
-},
+    },
 
+        /******************************************************
+     * METADATA ROW
+     ******************************************************/
 
-/******************************************************
- * METADATA ROW
- ******************************************************/
+    row(label,value){
 
-row(label,value){
+        if(!value) return "";
 
-    if(!value) return "";
-
-    return `
+        return `
 
 <div class="meta-row">
 
@@ -341,7 +362,10 @@ row(label,value){
 
 `;
 
-}
+    }
+
+};
+
 
 /******************************************************
  * STARTUP
@@ -351,6 +375,7 @@ document.addEventListener(
 
     "DOMContentLoaded",
 
-    ()=>Artist.initialize()
+    () => Artist.initialize()
 
 );
+
