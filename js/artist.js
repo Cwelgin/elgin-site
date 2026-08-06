@@ -303,11 +303,6 @@ const Artist = {
 
 </div>
 
-<div class="artist-blurb">
-
-    ${artist.blurb}
-
-</div>
 
 <div class="artist-updated">
 
