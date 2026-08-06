@@ -301,7 +301,9 @@ const Artist = {
             )}
 
         </div>
-
+<p class="artist-updated">
+    Last updated ${this.formatDate(artist.updated)}.
+</p>
     </div>
 
 </div>
