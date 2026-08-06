@@ -50,7 +50,7 @@ h1[data-animation-role="header-element"]{
 
     max-width:1200px;
 
-    margin:80px auto;
+    margin:8px auto;
 
     padding:0 30px;
 
@@ -60,11 +60,11 @@ h1[data-animation-role="header-element"]{
 
     display:grid;
 
-    grid-template-columns:minmax(450px,650px) 340px;
+    grid-template-columns:700px 340px;
 
-    gap:70px;
+    gap:60px;
 
-    align-items:start;
+    justify-content:center;
 
 }
 
