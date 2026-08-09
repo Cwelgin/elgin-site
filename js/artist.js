@@ -328,12 +328,16 @@ row(label,value){
     if(!value) return "";
 
     return `
-        <div class="meta-label">
-            ${label}
-        </div>
+        <div class="meta-row">
 
-        <div class="meta-value">
-            ${value}
+            <div class="meta-label">
+                ${label}
+            </div>
+
+            <div class="meta-value">
+                ${value}
+            </div>
+
         </div>
     `;
 
@@ -368,17 +372,20 @@ representationRow(artist){
     }
 
     return `
-        <div class="meta-label">
-            Representation
-        </div>
+        <div class="meta-row">
 
-        <div class="meta-value">
-            ${value}
+            <div class="meta-label">
+                Representation
+            </div>
+
+            <div class="meta-value">
+                ${value}
+            </div>
+
         </div>
     `;
 
-}
-};
+},
 
 /******************************************************
  * STARTUP
