@@ -375,7 +375,7 @@ representationRow(artist){
         <div class="meta-row">
 
             <div class="meta-label">
-                Representation
+                Gallery
             </div>
 
             <div class="meta-value">
