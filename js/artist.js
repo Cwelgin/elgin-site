@@ -301,6 +301,8 @@ formatDate(date){
                 artist.period
             )}
 
+            ${this.representationRow(artist)}
+
         </div>
 
         <p class="artist-updated">
@@ -317,37 +319,65 @@ formatDate(date){
 
     },
 
-        /******************************************************
-     * METADATA ROW
-     ******************************************************/
+/******************************************************
+ * METADATA ROW
+ ******************************************************/
 
-    row(label,value){
+row(label,value){
 
-        if(!value) return "";
+    if(!value) return "";
 
-        return `
+    return `
+        <div class="meta-label">
+            ${label}
+        </div>
 
-<div class="meta-row">
+        <div class="meta-value">
+            ${value}
+        </div>
+    `;
 
-    <div class="meta-label">
+},
 
-        ${label}
 
-    </div>
+/******************************************************
+ * REPRESENTATION ROW
+ ******************************************************/
 
-    <div class="meta-value">
+representationRow(artist){
 
-        ${value}
+    if(!artist.representation) return "";
 
-    </div>
+    let value = artist.representation;
 
-</div>
+    if(
+        artist.representationUrl &&
+        value.toLowerCase() !== "n/a"
+    ){
 
-`;
+        value = `
+            <a
+                href="${artist.representationUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+            >
+                ${artist.representation}
+            </a>
+        `;
 
     }
 
-};
+    return `
+        <div class="meta-label">
+            Representation
+        </div>
+
+        <div class="meta-value">
+            ${value}
+        </div>
+    `;
+
+}
 
 
 /******************************************************
