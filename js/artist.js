@@ -307,10 +307,7 @@ ${this.row(
     artist.period
 )}
 
-${this.row(
-    "Research",
-    artist.researchdisplay
-)}
+${this.researchRow(artist)}
 
 ${this.representationRow(artist)}
         </div>
@@ -328,7 +325,59 @@ ${this.representationRow(artist)}
 `;
 
     },
+/******************************************************
+ * RESEARCH ROW
+ ******************************************************/
 
+researchRow(artist){
+
+    const score =
+        parseInt(artist.research, 10) || 0;
+
+    if(!score) return "";
+
+    let level = "medium";
+
+    if(score <= 2){
+
+        level = "low";
+
+    }
+
+    else if(score >= 4){
+
+        level = "high";
+
+    }
+
+    const dots =
+
+        Array.from(
+            {length:5},
+            (_,index) => `
+
+                <span
+                    class="research-dot ${index < score ? level : ""}"
+                ></span>
+
+            `
+        ).join("");
+
+    return `
+        <div class="meta-row">
+
+            <div class="meta-label">
+                Research
+            </div>
+
+            <div class="meta-value research-value">
+                ${dots}
+            </div>
+
+        </div>
+    `;
+
+},
 /******************************************************
  * METADATA ROW
  ******************************************************/
