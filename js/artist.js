@@ -291,15 +291,20 @@ formatDate(date){
                 artist.nationality
             )}
 
-            ${this.row(
-                "Movement",
-                artist.movement
-            )}
+${this.row(
+    "Mode",
+    artist.mode
+)}
 
-            ${this.row(
-                "Genre",
-                artist.genre
-            )}
+${this.row(
+    "Genre",
+    artist.genre
+)}
+
+${this.row(
+    "School",
+    artist.school
+)}
 
 ${this.row(
     "Period",
