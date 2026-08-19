@@ -291,10 +291,6 @@ formatDate(date){
                 artist.nationality
             )}
 
-${this.row(
-    "Mode",
-    artist.mode
-)}
 
 ${this.row(
     "Genre",
