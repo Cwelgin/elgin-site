@@ -130,7 +130,7 @@ h1[data-animation-role="header-element"]{
 
     gap:0;
 
-    align-items:start;
+    align-items:center;
 
     padding:15px 0;
 
@@ -173,13 +173,45 @@ h1[data-animation-role="header-element"]{
 
 .research-value{
 
-    letter-spacing:4px;
+    display:flex;
 
-    color:#555;
+    align-items:center;
 
-    font-size:13px;
+    gap:6px;
 
     white-space:nowrap;
+
+}
+
+.research-dot{
+
+    width:9px;
+
+    height:9px;
+
+    border-radius:50%;
+
+    background:#555;
+
+    display:block;
+
+}
+
+.research-dot.low{
+
+    background:#b34b4b;
+
+}
+
+.research-dot.medium{
+
+    background:#555;
+
+}
+
+.research-dot.high{
+
+    background:#4f7d5b;
 
 }
 
