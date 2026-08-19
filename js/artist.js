@@ -133,16 +133,21 @@ const Artist = {
 
             const artist = {};
 
-            headers.forEach((header,index)=>{
+headers.forEach((header,index)=>{
 
-                artist[
-                    header.trim()
-                ] =
-                    values[index]
-                        ? values[index].trim()
-                        : "";
+    const key =
+        header
+            .trim()
+            .toLowerCase()
+            .replace(/^\uFEFF/, "")
+            .replace(/[^a-z0-9]/g, "");
 
-            });
+    artist[key] =
+        values[index]
+            ? values[index].trim()
+            : "";
+
+});
 
             rows.push(artist);
 
@@ -296,13 +301,17 @@ formatDate(date){
                 artist.genre
             )}
 
-            ${this.row(
-                "Period",
-                artist.period
-            )}
+${this.row(
+    "Period",
+    artist.period
+)}
 
-            ${this.representationRow(artist)}
+${this.row(
+    "Research",
+    artist.researchdisplay
+)}
 
+${this.representationRow(artist)}
         </div>
 
         <p class="artist-updated">
