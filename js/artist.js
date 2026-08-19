@@ -343,9 +343,9 @@ row(label,value){
                 ${label}
             </div>
 
-            <div class="meta-value">
-                ${value}
-            </div>
+<div class="meta-value ${label.toLowerCase()}-value">
+    ${value}
+</div>
 
         </div>
     `;
