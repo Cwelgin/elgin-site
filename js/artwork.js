@@ -1035,10 +1035,23 @@ const Artwork = {
    STARTUP
    ========================================================== */
 
-document.addEventListener(
+window.Artwork = Artwork;
 
-    "DOMContentLoaded",
 
-    ()=>Artwork.initialize()
+if(document.readyState === "loading"){
 
+    document.addEventListener(
+
+        "DOMContentLoaded",
+
+        ()=>Artwork.initialize()
+
+    );
+
+}
+else{
+
+    Artwork.initialize();
+
+}
 );
