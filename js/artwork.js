@@ -25,12 +25,23 @@ const SHEET_URL =
 
 const SOCIAL_ICONS = {
 
-    instagram: "",
-    facebook: "",
-    pinterest: "",
-    cara: "",
-    bluesky: "",
-    flickr: ""
+    instagram:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/b5725b5b-f048-4f6d-a5c0-d6eaff563415/Instagram_icon.png?content-type=image%2Fpng",
+
+    facebook:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/af0d0641-99bb-4818-b3a3-60f1173ed15f/Facebook_logo_%28square%29.png?content-type=image%2Fpng",
+
+    pinterest:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/e73f62cc-cda8-4e06-a463-1b4a7bd99a24/Pinterest.svg.webp?content-type=image%2Fwebp",
+
+    cara:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/414229ef-f40c-492a-b79a-7dce8b0c1713/Cara-app-logo-square.svg.webp?content-type=image%2Fwebp",
+
+    bluesky:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/b5d74408-e6cf-4d0a-a34f-f87216adeb9a/Bluesky_Logo.svg.webp?content-type=image%2Fwebp",
+
+    flickr:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/91384811-5bd7-4298-acdd-28edb40b7f06/Antu_flickr.svg.webp?content-type=image%2Fwebp"
 
 };
 
