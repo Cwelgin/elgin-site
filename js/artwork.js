@@ -63,29 +63,71 @@ const Artwork = {
 
         }
 
-        this.buildLayout(
-            element,
-            artwork
+buildLayout(element, artwork){
+
+    element.innerHTML = `
+
+<div class="artwork-header">
+
+    <div class="artwork-image-column">
+
+        <div class="artwork-image"></div>
+
+        <div class="artwork-social"
+             aria-label="External artwork links">
+        </div>
+
+    </div>
+
+    <div class="artwork-info">
+
+        <h1>${artwork.title}</h1>
+
+        <div class="meta"></div>
+
+    </div>
+
+</div>
+
+`;
+
+    this.renderSocialLinks(
+        element.querySelector(".artwork-social"),
+        artwork
+    );
+
+
+    if(
+        !document.querySelector(
+            ".artwork-lightbox"
+        )
+    ){
+
+        document.body.insertAdjacentHTML(
+
+            "beforeend",
+
+            `
+
+<div class="artwork-lightbox">
+
+    <div class="artwork-close">
+
+        &times;
+
+    </div>
+
+    <img>
+
+</div>
+
+`
+
         );
 
-        this.renderMetadata(
+    }
 
-            element.querySelector(".meta"),
-
-            artwork
-
-        );
-
-        await this.loadHeroImage(
-
-            element.querySelector(
-                ".artwork-image"
-            )
-
-        );
-
-    },
-
+},
 
     /******************************************************
      * LOAD ARTWORK
@@ -419,7 +461,123 @@ return [
         });
 
     },
+/******************************************************
+ * RENDER SOCIAL LINKS
+ ******************************************************/
 
+renderSocialLinks(container, artwork){
+
+    const platforms = [
+
+        {
+            key: "instagram",
+            label: "Instagram",
+            icon: "ICON_URL_INSTAGRAM"
+        },
+
+        {
+            key: "facebook",
+            label: "Facebook",
+            icon: "ICON_URL_FACEBOOK"
+        },
+
+        {
+            key: "pinterest",
+            label: "Pinterest",
+            icon: "ICON_URL_PINTEREST"
+        },
+
+        {
+            key: "cara",
+            label: "Cara",
+            icon: "ICON_URL_CARA"
+        },
+
+        {
+            key: "bluesky",
+            label: "Bluesky",
+            icon: "ICON_URL_BLUESKY"
+        },
+
+        {
+            key: "flickr",
+            label: "Flickr",
+            icon: "ICON_URL_FLICKR"
+        }
+
+    ];
+
+
+    platforms.forEach(platform=>{
+
+        const url =
+            artwork[platform.key];
+
+        if(!url) return;
+
+        if(
+            !platform.icon ||
+            platform.icon.startsWith("ICON_URL_")
+        ){
+
+            console.warn(
+                `Icon URL missing for ${platform.label}`
+            );
+
+            return;
+
+        }
+
+
+        const link =
+            document.createElement("a");
+
+        link.className =
+            `artwork-social-link artwork-social-${platform.key}`;
+
+        link.href =
+            url;
+
+        link.target =
+            "_blank";
+
+        link.rel =
+            "noopener noreferrer";
+
+        link.setAttribute(
+            "aria-label",
+            `View on ${platform.label}`
+        );
+
+        link.title =
+            platform.label;
+
+
+        const image =
+            document.createElement("img");
+
+        image.src =
+            platform.icon;
+
+        image.alt =
+            "";
+
+        image.loading =
+            "lazy";
+
+        image.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        link.append(image);
+
+        container.append(link);
+
+    });
+
+},
 
     /******************************************************
      * LOAD HERO IMAGE
