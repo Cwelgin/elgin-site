@@ -1065,4 +1065,3 @@ else{
     Artwork.initialize();
 
 }
-);
