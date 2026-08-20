@@ -1,16 +1,46 @@
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vRVojs1qLtfQIp7KKv8Zdjz7f7ZmUAh1AEKa521ddmeaBjsSmFsIjtwvu5GRCX1anqcpLrXGbRf_POy/pub?gid=0&single=true&output=csv";
 
+
 /*
 ============================================================
-
     artwork.js
-    ELGIN Core v3.0.0
-
+    ELGIN Core v3.1.0
+    Shared artwork renderer
 ============================================================
 */
 
+
+/* ==========================================================
+   SOCIAL ICON CONFIGURATION
+   ==========================================================
+
+   The spreadsheet contains the destination URL for each
+   artwork.
+
+   These six values contain the actual icon image URLs.
+
+   Leave blank until the official icon assets are ready.
+   ========================================================== */
+
+const SOCIAL_ICONS = {
+
+    instagram: "",
+    facebook: "",
+    pinterest: "",
+    cara: "",
+    bluesky: "",
+    flickr: ""
+
+};
+
+
+/* ==========================================================
+   ARTWORK
+   ========================================================== */
+
 const Artwork = {
+
 
     /******************************************************
      * ENTRY POINT
@@ -21,10 +51,13 @@ const Artwork = {
         const element =
             document.querySelector(".artwork");
 
+
         if(!element) return;
+
 
         const id =
             element.dataset.id?.trim();
+
 
         if(!id){
 
@@ -36,7 +69,9 @@ const Artwork = {
 
         }
 
+
         let artwork;
+
 
         try{
 
@@ -45,6 +80,7 @@ const Artwork = {
 
         }
 
+
         catch(error){
 
             console.error(error);
@@ -52,6 +88,7 @@ const Artwork = {
             return;
 
         }
+
 
         if(!artwork){
 
@@ -63,71 +100,57 @@ const Artwork = {
 
         }
 
-buildLayout(element, artwork){
 
-    element.innerHTML = `
+        /* --------------------------------------------------
+           BUILD PAGE
+           -------------------------------------------------- */
 
-<div class="artwork-header">
-
-    <div class="artwork-image-column">
-
-        <div class="artwork-image"></div>
-
-        <div class="artwork-social"
-             aria-label="External artwork links">
-        </div>
-
-    </div>
-
-    <div class="artwork-info">
-
-        <h1>${artwork.title}</h1>
-
-        <div class="meta"></div>
-
-    </div>
-
-</div>
-
-`;
-
-    this.renderSocialLinks(
-        element.querySelector(".artwork-social"),
-        artwork
-    );
+        this.buildLayout(
+            element,
+            artwork
+        );
 
 
-    if(
-        !document.querySelector(
-            ".artwork-lightbox"
-        )
-    ){
+        /* --------------------------------------------------
+           RENDER METADATA
+           -------------------------------------------------- */
 
-        document.body.insertAdjacentHTML(
+        this.renderMetadata(
 
-            "beforeend",
+            element.querySelector(".meta"),
 
-            `
-
-<div class="artwork-lightbox">
-
-    <div class="artwork-close">
-
-        &times;
-
-    </div>
-
-    <img>
-
-</div>
-
-`
+            artwork
 
         );
 
-    }
 
-},
+        /* --------------------------------------------------
+           RENDER SOCIAL LINKS
+           -------------------------------------------------- */
+
+        this.renderSocialLinks(
+
+            element.querySelector(".artwork-social"),
+
+            artwork
+
+        );
+
+
+        /* --------------------------------------------------
+           LOAD HERO IMAGE
+           -------------------------------------------------- */
+
+        await this.loadHeroImage(
+
+            element.querySelector(
+                ".artwork-image"
+            )
+
+        );
+
+    },
+
 
     /******************************************************
      * LOAD ARTWORK
@@ -138,6 +161,7 @@ buildLayout(element, artwork){
         const response =
             await fetch(SHEET_URL);
 
+
         if(!response.ok){
 
             throw new Error(
@@ -146,20 +170,26 @@ buildLayout(element, artwork){
 
         }
 
+
         const csv =
             await response.text();
 
+
         const rows =
             this.parseCSV(csv);
-return rows.find(
 
-    artwork =>
 
-        artwork.id &&
-        artwork.id.trim().toUpperCase() ===
-        id.trim().toUpperCase()
+        return rows.find(
 
-);
+            artwork =>
+
+                artwork.id &&
+
+                artwork.id.trim().toUpperCase() ===
+
+                id.trim().toUpperCase()
+
+        );
 
     },
 
@@ -173,23 +203,31 @@ return rows.find(
         const rows =
             [];
 
+
         const lines =
             csv.trim().split(/\r?\n/);
 
+
         const headers =
             this.parseCSVRow(
+
                 lines.shift()
+
             );
+
 
         lines.forEach(line=>{
 
             if(!line.trim()) return;
 
+
             const values =
                 this.parseCSVRow(line);
 
+
             const artwork =
                 {};
+
 
             headers.forEach((header,index)=>{
 
@@ -200,6 +238,11 @@ return rows.find(
 
             });
 
+
+            /* --------------------------------------------------
+               DIMENSIONS
+               -------------------------------------------------- */
+
             artwork.dimensions =
 
                 artwork.width &&
@@ -209,7 +252,13 @@ return rows.find(
 
                     : "";
 
+
+            /* --------------------------------------------------
+               DATE
+               -------------------------------------------------- */
+
             artwork.date =
+
                 this.formatDate(
 
                     artwork.startDate,
@@ -220,11 +269,13 @@ return rows.find(
 
                 );
 
+
             rows.push(
                 artwork
             );
 
         });
+
 
         return rows;
 
@@ -240,21 +291,31 @@ return rows.find(
         const values =
             [];
 
-        let value = "";
 
-        let quoted = false;
+        let value =
+            "";
 
-        for(let i=0;i<row.length;i++){
+
+        let quoted =
+            false;
+
+
+        for(
+            let i = 0;
+            i < row.length;
+            i++
+        ){
 
             const char =
                 row[i];
+
 
             if(char === '"'){
 
                 if(
 
                     quoted &&
-                    row[i+1] === '"'
+                    row[i + 1] === '"'
 
                 ){
 
@@ -266,11 +327,13 @@ return rows.find(
 
                 else{
 
-                    quoted = !quoted;
+                    quoted =
+                        !quoted;
 
                 }
 
             }
+
 
             else if(
 
@@ -283,9 +346,12 @@ return rows.find(
                     value
                 );
 
-                value = "";
+
+                value =
+                    "";
 
             }
+
 
             else{
 
@@ -295,55 +361,84 @@ return rows.find(
 
         }
 
+
         values.push(
             value
         );
+
 
         return values;
 
     },
 
 
-/******************************************************
- * FORMAT DATE
- ******************************************************/
+    /******************************************************
+     * FORMAT DATE
+     ******************************************************/
 
-formatDate(start,end){
+    formatDate(start,end){
 
-    const months = [
+        const months = [
 
-        "Jan","Feb","Mar","Apr",
-        "May","Jun","Jul","Aug",
-        "Sep","Oct","Nov","Dec"
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
 
-    ];
-
-    const format = value=>{
-
-        if(!value){
-            return "";
-        }
-
-        const [year,month] = value.split("-");
-
-        return `${months[Number(month)-1]} ${year}`;
-
-    };
-const startText = format(start);
-const endText   = format(end);
-
-return [
-    startText,
-    "–",
-    endText
-].join(" ");
+        ];
 
 
-},
+        const format = value=>{
+
+            if(!value){
+
+                return "";
+
+            }
 
 
+            const [
+                year,
+                month
+            ] =
+                value.split("-");
 
-     /******************************************************
+
+            return `${months[Number(month)-1]} ${year}`;
+
+        };
+
+
+        const startText =
+            format(start);
+
+
+        const endText =
+            format(end);
+
+
+        return [
+
+            startText,
+
+            "–",
+
+            endText
+
+        ].join(" ");
+
+    },
+
+
+    /******************************************************
      * BUILD LAYOUT
      ******************************************************/
 
@@ -353,7 +448,17 @@ return [
 
 <div class="artwork-header">
 
-    <div class="artwork-image"></div>
+    <div class="artwork-image-column">
+
+        <div class="artwork-image"></div>
+
+        <div
+            class="artwork-social"
+            aria-label="External artwork links">
+        </div>
+
+    </div>
+
 
     <div class="artwork-info">
 
@@ -367,10 +472,17 @@ return [
 
 `;
 
+
+        /* --------------------------------------------------
+           CREATE LIGHTBOX
+           -------------------------------------------------- */
+
         if(
+
             !document.querySelector(
                 ".artwork-lightbox"
             )
+
         ){
 
             document.body.insertAdjacentHTML(
@@ -408,35 +520,67 @@ return [
 
         const fields = [
 
-            ["atlas","ATLAS"],
-            ["regime","RÉGIME"],
-            ["medium","MEDIUM"],
-            ["dimensions","DIMENSIONS"],
-            ["date","DATE"],
-            ["status","STATUS"]
+            [
+                "atlas",
+                "ATLAS"
+            ],
+
+            [
+                "regime",
+                "RÉGIME"
+            ],
+
+            [
+                "medium",
+                "MEDIUM"
+            ],
+
+            [
+                "dimensions",
+                "DIMENSIONS"
+            ],
+
+            [
+                "date",
+                "DATE"
+            ],
+
+            [
+                "status",
+                "STATUS"
+            ]
 
         ];
 
-        fields.forEach(([key,label])=>{
 
-            const value =
-                artwork[key];
+        fields.forEach(
+            ([key,label])=>{
 
-            if(!value) return;
+                const value =
+                    artwork[key];
 
-            const display =
 
-                key === "status"
+                if(!value) return;
 
-                    ? `<span class="status ${value.toLowerCase().replace(/\s+/g,"-")}">${value}</span>`
 
-                    : value;
+                const display =
 
-            container.insertAdjacentHTML(
+                    key === "status"
 
-                "beforeend",
+                        ?
 
-                `
+                        `<span class="status ${value.toLowerCase().replace(/\s+/g,"-")}">${value}</span>`
+
+                        :
+
+                        value;
+
+
+                container.insertAdjacentHTML(
+
+                    "beforeend",
+
+                    `
 
 <div class="meta-row">
 
@@ -456,128 +600,179 @@ return [
 
 `
 
+                );
+
+            }
+
+        );
+
+    },
+
+
+    /******************************************************
+     * RENDER SOCIAL LINKS
+     ******************************************************/
+
+    renderSocialLinks(container, artwork){
+
+        if(!container) return;
+
+
+        const platforms = [
+
+            {
+                key: "instagram",
+                label: "Instagram",
+                icon: SOCIAL_ICONS.instagram
+            },
+
+            {
+                key: "facebook",
+                label: "Facebook",
+                icon: SOCIAL_ICONS.facebook
+            },
+
+            {
+                key: "pinterest",
+                label: "Pinterest",
+                icon: SOCIAL_ICONS.pinterest
+            },
+
+            {
+                key: "cara",
+                label: "Cara",
+                icon: SOCIAL_ICONS.cara
+            },
+
+            {
+                key: "bluesky",
+                label: "Bluesky",
+                icon: SOCIAL_ICONS.bluesky
+            },
+
+            {
+                key: "flickr",
+                label: "Flickr",
+                icon: SOCIAL_ICONS.flickr
+            }
+
+        ];
+
+
+        platforms.forEach(platform=>{
+
+
+            /* --------------------------------------------------
+               NO ARTWORK URL = NO ICON
+               -------------------------------------------------- */
+
+            const url =
+                artwork[platform.key];
+
+
+            if(!url) return;
+
+
+            /* --------------------------------------------------
+               NO ICON ASSET YET = DON'T RENDER
+               -------------------------------------------------- */
+
+            if(!platform.icon){
+
+                console.warn(
+
+                    `Icon asset not configured for ${platform.label}.`
+
+                );
+
+                return;
+
+            }
+
+
+            /* --------------------------------------------------
+               CREATE LINK
+               -------------------------------------------------- */
+
+            const link =
+                document.createElement("a");
+
+
+            link.className =
+                `artwork-social-link artwork-social-${platform.key}`;
+
+
+            link.href =
+                url;
+
+
+            link.target =
+                "_blank";
+
+
+            link.rel =
+                "noopener noreferrer";
+
+
+            link.setAttribute(
+
+                "aria-label",
+
+                `View on ${platform.label}`
+
+            );
+
+
+            link.title =
+                platform.label;
+
+
+            /* --------------------------------------------------
+               CREATE ICON
+               -------------------------------------------------- */
+
+            const image =
+                document.createElement("img");
+
+
+            image.src =
+                platform.icon;
+
+
+            image.alt =
+                "";
+
+
+            image.loading =
+                "lazy";
+
+
+            image.setAttribute(
+
+                "aria-hidden",
+
+                "true"
+
+            );
+
+
+            /* --------------------------------------------------
+               ADD ICON TO LINK
+               -------------------------------------------------- */
+
+            link.append(
+                image
+            );
+
+
+            container.append(
+                link
             );
 
         });
 
     },
-/******************************************************
- * RENDER SOCIAL LINKS
- ******************************************************/
 
-renderSocialLinks(container, artwork){
-
-    const platforms = [
-
-        {
-            key: "instagram",
-            label: "Instagram",
-            icon: "ICON_URL_INSTAGRAM"
-        },
-
-        {
-            key: "facebook",
-            label: "Facebook",
-            icon: "ICON_URL_FACEBOOK"
-        },
-
-        {
-            key: "pinterest",
-            label: "Pinterest",
-            icon: "ICON_URL_PINTEREST"
-        },
-
-        {
-            key: "cara",
-            label: "Cara",
-            icon: "ICON_URL_CARA"
-        },
-
-        {
-            key: "bluesky",
-            label: "Bluesky",
-            icon: "ICON_URL_BLUESKY"
-        },
-
-        {
-            key: "flickr",
-            label: "Flickr",
-            icon: "ICON_URL_FLICKR"
-        }
-
-    ];
-
-
-    platforms.forEach(platform=>{
-
-        const url =
-            artwork[platform.key];
-
-        if(!url) return;
-
-        if(
-            !platform.icon ||
-            platform.icon.startsWith("ICON_URL_")
-        ){
-
-            console.warn(
-                `Icon URL missing for ${platform.label}`
-            );
-
-            return;
-
-        }
-
-
-        const link =
-            document.createElement("a");
-
-        link.className =
-            `artwork-social-link artwork-social-${platform.key}`;
-
-        link.href =
-            url;
-
-        link.target =
-            "_blank";
-
-        link.rel =
-            "noopener noreferrer";
-
-        link.setAttribute(
-            "aria-label",
-            `View on ${platform.label}`
-        );
-
-        link.title =
-            platform.label;
-
-
-        const image =
-            document.createElement("img");
-
-        image.src =
-            platform.icon;
-
-        image.alt =
-            "";
-
-        image.loading =
-            "lazy";
-
-        image.setAttribute(
-            "aria-hidden",
-            "true"
-        );
-
-
-        link.append(image);
-
-        container.append(link);
-
-    });
-
-},
 
     /******************************************************
      * LOAD HERO IMAGE
@@ -589,65 +784,94 @@ renderSocialLinks(container, artwork){
 
             const response =
                 await fetch(
+
                     window.location.pathname
+
                 );
+
 
             if(!response.ok){
 
                 throw new Error(
+
                     "Unable to load page."
+
                 );
 
             }
 
+
             const html =
                 await response.text();
 
+
             const doc =
                 new DOMParser().parseFromString(
+
                     html,
+
                     "text/html"
+
                 );
+
 
             const images =
 
                 [
+
                     ...doc.querySelectorAll(
+
                         ".image-slide-anchor"
+
                     )
+
                 ].map(
 
-                    image=>image.href
+                    image =>
+                        image.href
 
                 );
+
 
             if(!images.length){
 
                 console.warn(
+
                     "No gallery images found."
+
                 );
 
                 return;
 
             }
 
+
             const source =
                 images.at(-1);
+
 
             const img =
                 document.createElement(
                     "img"
                 );
 
-            img.src = source;
 
-            img.loading = "eager";
+            img.src =
+                source;
 
-            img.decoding = "async";
+
+            img.loading =
+                "eager";
+
+
+            img.decoding =
+                "async";
+
 
             container.append(
                 img
             );
+
 
             this.initializeLightbox(
 
@@ -658,6 +882,7 @@ renderSocialLinks(container, artwork){
             );
 
         }
+
 
         catch(error){
 
@@ -676,15 +901,20 @@ renderSocialLinks(container, artwork){
 
         const overlay =
             document.querySelector(
+
                 ".artwork-lightbox"
+
             );
 
+
         if(!overlay) return;
+
 
         const large =
             overlay.querySelector(
                 "img"
             );
+
 
         const close = ()=>{
 
@@ -692,27 +922,40 @@ renderSocialLinks(container, artwork){
                 "open"
             );
 
+
             document.body.classList.remove(
+
                 "artwork-lightbox-open"
+
             );
 
         };
 
+
         if(
+
             !overlay.dataset.initialized
+
         ){
 
             overlay.dataset.initialized =
                 "true";
 
+
             overlay
+
                 .querySelector(
                     ".artwork-close"
                 )
+
                 .addEventListener(
+
                     "click",
+
                     close
+
                 );
+
 
             overlay.addEventListener(
 
@@ -721,7 +964,9 @@ renderSocialLinks(container, artwork){
                 event=>{
 
                     if(
-                        event.target===overlay
+
+                        event.target === overlay
+
                     ){
 
                         close();
@@ -732,6 +977,7 @@ renderSocialLinks(container, artwork){
 
             );
 
+
             document.addEventListener(
 
                 "keydown",
@@ -739,7 +985,9 @@ renderSocialLinks(container, artwork){
                 event=>{
 
                     if(
-                        event.key==="Escape"
+
+                        event.key === "Escape"
+
                     ){
 
                         close();
@@ -752,6 +1000,7 @@ renderSocialLinks(container, artwork){
 
         }
 
+
         image.addEventListener(
 
             "click",
@@ -761,12 +1010,16 @@ renderSocialLinks(container, artwork){
                 large.src =
                     source;
 
+
                 overlay.classList.add(
                     "open"
                 );
 
+
                 document.body.classList.add(
+
                     "artwork-lightbox-open"
+
                 );
 
             }
@@ -778,9 +1031,9 @@ renderSocialLinks(container, artwork){
 };
 
 
-/******************************************************
- * STARTUP
- ******************************************************/
+/* ==========================================================
+   STARTUP
+   ========================================================== */
 
 document.addEventListener(
 
@@ -788,6 +1041,4 @@ document.addEventListener(
 
     ()=>Artwork.initialize()
 
-);   
-    
-    
+);
