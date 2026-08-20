@@ -62,7 +62,6 @@ h1[data-animation-role="header-element"]{
     justify-content:center;
     align-items:center;
 
-    align-self:stretch;
 
 }
 
@@ -89,7 +88,121 @@ h1[data-animation-role="header-element"]{
     opacity:.97;
 
 }
+/* ==========================================================
+   IMAGE COLUMN
+   ========================================================== */
 
+.artwork-image-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-self:start;
+
+    min-width:0;
+
+}
+
+
+/* ==========================================================
+   SOCIAL LINKS
+   ========================================================== */
+
+.artwork-social{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+    gap:10px;
+
+    margin-top:12px;
+
+    min-height:20px;
+
+}
+
+
+.artwork-social-link{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:32px;
+    height:32px;
+
+    text-decoration:none;
+
+    border:none;
+
+    background:transparent;
+
+    opacity:.72;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+
+}
+
+
+.artwork-social-link img{
+
+    display:block;
+
+    width:20px;
+    height:20px;
+
+    object-fit:contain;
+
+}
+
+
+.artwork-social-link:hover{
+
+    opacity:1;
+
+    transform:translateY(-1px);
+
+}
+
+
+.artwork-social-link:focus-visible{
+
+    outline:1px solid #888;
+
+    outline-offset:3px;
+
+}
+
+
+/* ==========================================================
+   MOBILE
+   ========================================================== */
+
+@media (max-width:900px){
+
+    .artwork-header{
+
+        grid-template-columns:1fr;
+
+        gap:40px;
+
+    }
+
+    .artwork-image-column{
+
+        width:100%;
+
+    }
+
+}
 
 /* ==========================================================
    METADATA
