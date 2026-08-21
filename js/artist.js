@@ -269,7 +269,7 @@ buildLayout(element,artist){
             alt="${artist.name}">
 
         <p class="artist-updated">
-            Last Updated: ${this.formatDate(artist.updated)}.
+            Last Updated: ${this.formatDate(artist.updated)}
         </p>
 
     </div>
