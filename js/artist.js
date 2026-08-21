@@ -244,21 +244,21 @@ formatDate(date){
 },
 
 
-    /******************************************************
-     * BUILD PAGE
-     ******************************************************/
+/******************************************************
+ * BUILD PAGE
+ ******************************************************/
 
-    buildLayout(element,artist){
+buildLayout(element,artist){
 
-        const years =
+    const years =
 
-            artist.died
+        artist.died
 
-                ? `${artist.born}–${artist.died}`
+            ? `${artist.born}–${artist.died}`
 
-                : `${artist.born}–`;
+            : `${artist.born}–`;
 
-        element.innerHTML = `
+    element.innerHTML = `
 
 <div class="artist-header">
 
@@ -267,6 +267,10 @@ formatDate(date){
         <img
             src="${artist.image}"
             alt="${artist.name}">
+
+        <p class="artist-updated">
+            Last updated ${this.formatDate(artist.updated)}.
+        </p>
 
     </div>
 
@@ -291,32 +295,26 @@ formatDate(date){
                 artist.nationality
             )}
 
+            ${this.row(
+                "Genre",
+                artist.genre
+            )}
 
-${this.row(
-    "Genre",
-    artist.genre
-)}
+            ${this.row(
+                "School",
+                artist.school
+            )}
 
-${this.row(
-    "School",
-    artist.school
-)}
+            ${this.row(
+                "Period",
+                artist.period
+            )}
 
-${this.row(
-    "Period",
-    artist.period
-)}
+            ${this.researchRow(artist)}
 
-${this.researchRow(artist)}
+            ${this.representationRow(artist)}
 
-${this.representationRow(artist)}
         </div>
-
-        <p class="artist-updated">
-        
-    Last updated ${this.formatDate(artist.updated)}.
-
-        </p>
 
     </div>
 
@@ -324,7 +322,7 @@ ${this.representationRow(artist)}
 
 `;
 
-    },
+},
 /******************************************************
  * RESEARCH ROW
  ******************************************************/
