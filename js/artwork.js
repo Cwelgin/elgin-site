@@ -41,7 +41,10 @@ const SOCIAL_ICONS = {
         "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/b5d74408-e6cf-4d0a-a34f-f87216adeb9a/Bluesky_Logo.svg.webp?content-type=image%2Fwebp",
 
     flickr:
-        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/91384811-5bd7-4298-acdd-28edb40b7f06/Antu_flickr.svg.webp?content-type=image%2Fwebp"
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/91384811-5bd7-4298-acdd-28edb40b7f06/Antu_flickr.svg.webp?content-type=image%2Fwebp",
+
+    Youtube:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/2d2d5adf-4768-46df-ab3f-12958769c1f3/Youtube+logo.png?content-type=image%2Fpng"
 
 };
 
@@ -665,6 +668,11 @@ const Artwork = {
                 key: "flickr",
                 label: "Flickr",
                 icon: SOCIAL_ICONS.flickr
+            },
+            {
+                key: "youtube",
+                label: "YouTube",
+                icon: SOCIAL_ICONS.youtube
             }
 
         ];
