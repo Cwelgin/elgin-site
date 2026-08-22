@@ -43,7 +43,7 @@ const SOCIAL_ICONS = {
     flickr:
         "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/91384811-5bd7-4298-acdd-28edb40b7f06/Antu_flickr.svg.webp?content-type=image%2Fwebp",
 
-    Youtube:
+    youtube:
         "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/2d2d5adf-4768-46df-ab3f-12958769c1f3/Youtube+logo.png?content-type=image%2Fpng"
 
 };
@@ -671,7 +671,7 @@ const Artwork = {
             },
             {
                 key: "youtube",
-                label: "YouTube",
+                label: "youtube",
                 icon: SOCIAL_ICONS.youtube
             }
 
