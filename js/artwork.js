@@ -44,7 +44,10 @@ const SOCIAL_ICONS = {
         "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/91384811-5bd7-4298-acdd-28edb40b7f06/Antu_flickr.svg.webp?content-type=image%2Fwebp",
 
     youtube:
-        "https://cdn.simpleicons.org/youtube"
+        "https://cdn.simpleicons.org/youtube",
+
+    tumblr:
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/465f46ca-a0d5-4e61-8f8b-1dabddf11add/tumblr+icon.png?content-type=image%2Fpng"
 
 };
 
@@ -673,6 +676,11 @@ const Artwork = {
                 key: "youtube",
                 label: "youtube",
                 icon: SOCIAL_ICONS.youtube
+            },
+            {
+                key: "tumblr",
+                label: "tumblr",
+                icon: SOCIAL_ICONS.tumblr
             }
 
         ];
