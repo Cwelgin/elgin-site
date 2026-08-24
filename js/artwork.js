@@ -47,7 +47,7 @@ const SOCIAL_ICONS = {
         "https://cdn.simpleicons.org/youtube",
 
     tumblr:
-        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/b5725b5b-f048-4f6d-a5c0-d6eaff563415/Instagram_icon.png?content-type=image%2Fpng"
+        "https://images.squarespace-cdn.com/content/55c198cce4b054daaf17f596/465f46ca-a0d5-4e61-8f8b-1dabddf11add/tumblr+icon.png?content-type=image%2Fpng"
 
 };
 
