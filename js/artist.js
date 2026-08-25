@@ -134,13 +134,11 @@ const Artist = {
             const artist = {};
 
 headers.forEach((header,index)=>{
-
-    const key =
-        header
-            .trim()
-            .toLowerCase()
-            .replace(/^\uFEFF/, "")
-            .replace(/[^a-z0-9]/g, "");
+const key =
+    header
+        .trim()
+        .replace(/^\uFEFF/, "")
+        .replace(/[^a-zA-Z0-9]/g, "");
 
     artist[key] =
         values[index]
