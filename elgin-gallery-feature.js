@@ -1,22 +1,6 @@
 (function () {
 
     /* ==========================================================
-       ELGIN GALLERY FEATURE
-       Version 1.2
-
-       Squarespace provides:
-       - data-source
-       - text/content inside the container
-
-       GitHub controls:
-       - layout
-       - artwork sizing
-       - responsive behavior
-       - gallery/image retrieval
-       ========================================================== */
-
-
-    /* ==========================================================
        FIND THIS PARTICULAR CODE BLOCK
        ========================================================== */
 
@@ -62,249 +46,163 @@
        STYLING
        ========================================================== */
 
-    const STYLE_ID =
-        "elgin-gallery-feature-styles";
+    const CSS = `
 
-    if (!document.getElementById(STYLE_ID)) {
-
-        const CSS = `
-
-            /* ==================================================
-               OUTER CONTAINER
-               ================================================== */
-
-            .elgin-gallery-feature {
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
+        .elgin-gallery-feature {
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
 
-            /* ==================================================
-               MAIN FEATURE
-               ================================================== */
+        .elgin-gallery-feature .elgin-feature-inner {
+            width: 100%;
+            min-height: 360px;
+            max-height: 360px;
+
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+
+            margin: 0;
+            padding: 0;
+
+            border: 1px solid #d8d8d8;
+            box-sizing: border-box;
+        }
+
+
+        /* IMAGE */
+
+        .elgin-gallery-feature .elgin-feature-image-wrap {
+            width: 100%;
+            height: 358px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            padding: 2px;
+
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+
+        .elgin-gallery-feature .elgin-feature-image {
+            display: block;
+
+            max-width: 100%;
+            max-height: 354px;
+
+            width: auto;
+            height: auto;
+
+            object-fit: contain;
+
+            margin: 0;
+            padding: 0;
+        }
+
+
+        /* TEXT */
+
+        .elgin-gallery-feature .elgin-feature-text {
+            height: 358px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            box-sizing: border-box;
+
+            padding: 40px 50px;
+
+            border-left: 1px solid #d8d8d8;
+        }
+
+
+        .elgin-gallery-feature .elgin-feature-text p {
+            margin: 0;
+            padding: 0;
+
+            line-height: 1.6;
+        }
+
+
+        /* LINK */
+
+        .elgin-gallery-feature .elgin-feature-text a {
+            display: inline-block;
+
+            margin-top: 22px;
+
+            text-decoration: none;
+
+            font-size: 0.85em;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+
+        .elgin-gallery-feature .elgin-feature-text a:hover {
+            text-decoration: underline;
+        }
+
+
+        /* MOBILE */
+
+        @media screen and (max-width: 767px) {
 
             .elgin-gallery-feature .elgin-feature-inner {
+                display: block;
 
+                min-height: 0;
+                max-height: none;
+            }
+
+
+            .elgin-gallery-feature .elgin-feature-image-wrap {
                 width: 100%;
+                height: auto;
 
-                display: grid;
+                min-height: 300px;
+                max-height: 360px;
 
-                grid-template-columns:
-                    minmax(0, 1fr)
-                    minmax(0, 1fr);
-
-                margin: 0;
-                padding: 0;
-
-                border: 1px solid #e5e5e5;
-
-                box-sizing: border-box;
-
-                overflow: hidden;
+                border-bottom: 1px solid #d8d8d8;
             }
 
 
-            /* ==================================================
-               IMAGE COLUMN
-               ================================================== */
+            .elgin-gallery-feature .elgin-feature-image {
+                max-width: 100%;
+                max-height: 354px;
+            }
 
-            .elgin-gallery-feature
-            .elgin-feature-image-wrap {
 
+            .elgin-gallery-feature .elgin-feature-text {
                 width: 100%;
+                height: auto;
 
-                display: flex;
+                padding: 35px 30px;
 
-                align-items: center;
-                justify-content: center;
-
-                padding: 20px;
-
-                box-sizing: border-box;
-
-                min-width: 0;
-
-                overflow: hidden;
+                border-left: none;
             }
 
+        }
 
-            /* ==================================================
-               ARTWORK
+    `;
 
-               Maximum:
-               420px wide
-               500px high
 
-               IMPORTANT:
-               These rules deliberately override
-               Squarespace's global image styling.
-               ================================================== */
+    /* ==========================================================
+       ADD STYLES
+       ========================================================== */
 
-            .elgin-gallery-feature
-            .elgin-feature-image {
+    const style =
+        document.createElement("style");
 
-                display: block !important;
+    style.textContent = CSS;
 
-                width: auto !important;
-                height: auto !important;
-
-                max-width: 420px !important;
-                max-height: 500px !important;
-
-                min-width: 0 !important;
-                min-height: 0 !important;
-
-                object-fit: contain !important;
-
-                margin: 0 !important;
-                padding: 0 !important;
-
-                flex: 0 0 auto !important;
-            }
-
-
-            /* ==================================================
-               TEXT COLUMN
-               ================================================== */
-
-            .elgin-gallery-feature
-            .elgin-feature-text {
-
-                display: flex;
-
-                flex-direction: column;
-
-                justify-content: center;
-
-                box-sizing: border-box;
-
-                padding: 40px 50px;
-
-                border-left: 1px solid #e5e5e5;
-
-                min-width: 0;
-            }
-
-
-            /* ==================================================
-               TEXT
-               ================================================== */
-
-            .elgin-gallery-feature
-            .elgin-feature-text p {
-
-                margin: 0;
-                padding: 0;
-
-                line-height: 1.6;
-            }
-
-
-            /* ==================================================
-               LINK
-               ================================================== */
-
-            .elgin-gallery-feature
-            .elgin-feature-text a {
-
-                display: inline-block;
-
-                margin-top: 22px;
-
-                text-decoration: none;
-
-                font-size: 0.85em;
-
-                letter-spacing: 0.08em;
-
-                text-transform: uppercase;
-            }
-
-
-            .elgin-gallery-feature
-            .elgin-feature-text a:hover {
-
-                text-decoration: underline;
-            }
-
-
-            /* ==================================================
-               MOBILE
-               ================================================== */
-
-            @media screen and (max-width: 767px) {
-
-                .elgin-gallery-feature
-                .elgin-feature-inner {
-
-                    display: block;
-
-                }
-
-
-                /* IMAGE */
-
-                .elgin-gallery-feature
-                .elgin-feature-image-wrap {
-
-                    width: 100%;
-
-                    min-height: 0;
-
-                    max-height: none;
-
-                    padding: 20px;
-
-                    border-bottom:
-                        1px solid #e5e5e5;
-
-                }
-
-
-                .elgin-gallery-feature
-                .elgin-feature-image {
-
-                    width: auto !important;
-                    height: auto !important;
-
-                    max-width: 100% !important;
-                    max-height: 500px !important;
-
-                }
-
-
-                /* TEXT */
-
-                .elgin-gallery-feature
-                .elgin-feature-text {
-
-                    width: 100%;
-
-                    height: auto;
-
-                    padding: 35px 30px;
-
-                    border-left: none;
-
-                }
-
-            }
-
-        `;
-
-
-        const style =
-            document.createElement("style");
-
-        style.id = STYLE_ID;
-
-        style.textContent = CSS;
-
-        document.head.appendChild(style);
-
-    }
+    document.head.appendChild(style);
 
 
     /* ==========================================================
@@ -453,7 +351,6 @@
 
                             return {
                                 url: parts[0],
-
                                 width:
                                     parseInt(
                                         parts[1],
@@ -525,70 +422,6 @@
                 </div>
 
             `;
-
-
-            /* ==================================================
-               GET THE NEW IMAGE
-               ================================================== */
-
-            const featureImage =
-                container.querySelector(
-                    ".elgin-feature-image"
-                );
-
-
-            /* ==================================================
-               FORCE ARTWORK SIZING
-
-               This protects the component against
-               Squarespace's global image CSS.
-               ================================================== */
-
-            if (featureImage) {
-
-                featureImage.style.setProperty(
-                    "width",
-                    "auto",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "height",
-                    "auto",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "max-width",
-                    "420px",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "max-height",
-                    "500px",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "object-fit",
-                    "contain",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "margin",
-                    "0",
-                    "important"
-                );
-
-                featureImage.style.setProperty(
-                    "padding",
-                    "0",
-                    "important"
-                );
-
-            }
 
 
             /* ==================================================
