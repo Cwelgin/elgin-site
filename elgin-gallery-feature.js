@@ -67,7 +67,6 @@
             margin: 0;
             padding: 0;
 
-            border: 1px solid #d8d8d8;
             box-sizing: border-box;
         }
 
@@ -138,7 +137,6 @@
 
             padding: 40px 50px;
 
-            border-left: 1px solid #d8d8d8;
         }
 
 
