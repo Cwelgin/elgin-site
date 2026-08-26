@@ -145,7 +145,7 @@
         .elgin-gallery-feature .elgin-feature-text p {
             margin: 0;
             padding: 0;
-
+            font-size: 16px;
             line-height: 1.6;
         }
 
@@ -159,8 +159,9 @@
 
             text-decoration: none;
 
-            font-size: 0.85em;
-            letter-spacing: 0.08em;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.10em;
             text-transform: uppercase;
         }
 
