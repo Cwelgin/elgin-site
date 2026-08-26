@@ -74,19 +74,21 @@
 
         /* IMAGE */
 
-        .elgin-gallery-feature .elgin-feature-image-wrap {
-            width: 100%;
-            height: 358px;
+.elgin-gallery-feature .elgin-feature-image-wrap {
+    width: 100%;
+    height: 358px;
 
-            display: flex;
-            align-items: center;
-            justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-            padding: 2px;
+    padding: 2px;
 
-            overflow: hidden;
-            box-sizing: border-box;
-        }
+    overflow: hidden;
+    box-sizing: border-box;
+
+    min-width: 0;
+}
 
 
         .elgin-gallery-feature .elgin-feature-image {
@@ -104,7 +106,25 @@
             padding: 0;
         }
 
+.elgin-gallery-feature .elgin-feature-image {
+    display: block !important;
 
+    max-width: 100% !important;
+    max-height: 354px !important;
+
+    width: auto !important;
+    height: auto !important;
+
+    object-fit: contain !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    min-width: 0 !important;
+    min-height: 0 !important;
+
+    flex: 0 1 auto !important;
+}
         /* TEXT */
 
         .elgin-gallery-feature .elgin-feature-text {
