@@ -2,7 +2,7 @@
 
     /* ==========================================================
        ELGIN GALLERY FEATURE
-       Version 1.1
+       Version 1.2
 
        Squarespace provides:
        - data-source
@@ -10,8 +10,7 @@
 
        GitHub controls:
        - layout
-       - image sizing
-       - typography behavior
+       - artwork sizing
        - responsive behavior
        - gallery/image retrieval
        ========================================================== */
@@ -102,6 +101,8 @@
                 border: 1px solid #e5e5e5;
 
                 box-sizing: border-box;
+
+                overflow: hidden;
             }
 
 
@@ -109,7 +110,8 @@
                IMAGE COLUMN
                ================================================== */
 
-            .elgin-gallery-feature .elgin-feature-image-wrap {
+            .elgin-gallery-feature
+            .elgin-feature-image-wrap {
 
                 width: 100%;
 
@@ -123,33 +125,43 @@
                 box-sizing: border-box;
 
                 min-width: 0;
+
+                overflow: hidden;
             }
 
 
             /* ==================================================
-               IMAGE
+               ARTWORK
 
-               Maximum artwork size:
+               Maximum:
                420px wide
                500px high
 
-               Aspect ratio is always preserved.
+               IMPORTANT:
+               These rules deliberately override
+               Squarespace's global image styling.
                ================================================== */
 
-            .elgin-gallery-feature .elgin-feature-image {
+            .elgin-gallery-feature
+            .elgin-feature-image {
 
-                display: block;
+                display: block !important;
 
-                width: auto;
-                height: auto;
+                width: auto !important;
+                height: auto !important;
 
-                max-width: 420px;
-                max-height: 500px;
+                max-width: 420px !important;
+                max-height: 500px !important;
 
-                object-fit: contain;
+                min-width: 0 !important;
+                min-height: 0 !important;
 
-                margin: 0;
-                padding: 0;
+                object-fit: contain !important;
+
+                margin: 0 !important;
+                padding: 0 !important;
+
+                flex: 0 0 auto !important;
             }
 
 
@@ -157,7 +169,8 @@
                TEXT COLUMN
                ================================================== */
 
-            .elgin-gallery-feature .elgin-feature-text {
+            .elgin-gallery-feature
+            .elgin-feature-text {
 
                 display: flex;
 
@@ -177,12 +190,10 @@
 
             /* ==================================================
                TEXT
-
-               Inherits the Squarespace site's normal body
-               typography unless overridden by Squarespace.
                ================================================== */
 
-            .elgin-gallery-feature .elgin-feature-text p {
+            .elgin-gallery-feature
+            .elgin-feature-text p {
 
                 margin: 0;
                 padding: 0;
@@ -195,7 +206,8 @@
                LINK
                ================================================== */
 
-            .elgin-gallery-feature .elgin-feature-text a {
+            .elgin-gallery-feature
+            .elgin-feature-text a {
 
                 display: inline-block;
 
@@ -211,7 +223,8 @@
             }
 
 
-            .elgin-gallery-feature .elgin-feature-text a:hover {
+            .elgin-gallery-feature
+            .elgin-feature-text a:hover {
 
                 text-decoration: underline;
             }
@@ -223,7 +236,8 @@
 
             @media screen and (max-width: 767px) {
 
-                .elgin-gallery-feature .elgin-feature-inner {
+                .elgin-gallery-feature
+                .elgin-feature-inner {
 
                     display: block;
 
@@ -237,9 +251,9 @@
 
                     width: 100%;
 
-                    min-height: 300px;
+                    min-height: 0;
 
-                    max-height: 540px;
+                    max-height: none;
 
                     padding: 20px;
 
@@ -252,9 +266,11 @@
                 .elgin-gallery-feature
                 .elgin-feature-image {
 
-                    max-width: 100%;
+                    width: auto !important;
+                    height: auto !important;
 
-                    max-height: 500px;
+                    max-width: 100% !important;
+                    max-height: 500px !important;
 
                 }
 
@@ -509,6 +525,70 @@
                 </div>
 
             `;
+
+
+            /* ==================================================
+               GET THE NEW IMAGE
+               ================================================== */
+
+            const featureImage =
+                container.querySelector(
+                    ".elgin-feature-image"
+                );
+
+
+            /* ==================================================
+               FORCE ARTWORK SIZING
+
+               This protects the component against
+               Squarespace's global image CSS.
+               ================================================== */
+
+            if (featureImage) {
+
+                featureImage.style.setProperty(
+                    "width",
+                    "auto",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "height",
+                    "auto",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "max-width",
+                    "420px",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "max-height",
+                    "500px",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "object-fit",
+                    "contain",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "margin",
+                    "0",
+                    "important"
+                );
+
+                featureImage.style.setProperty(
+                    "padding",
+                    "0",
+                    "important"
+                );
+
+            }
 
 
             /* ==================================================
