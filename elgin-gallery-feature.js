@@ -1,6 +1,23 @@
 (function () {
 
     /* ==========================================================
+       ELGIN GALLERY FEATURE
+       Version 1.1
+
+       Squarespace provides:
+       - data-source
+       - text/content inside the container
+
+       GitHub controls:
+       - layout
+       - image sizing
+       - typography behavior
+       - responsive behavior
+       - gallery/image retrieval
+       ========================================================== */
+
+
+    /* ==========================================================
        FIND THIS PARTICULAR CODE BLOCK
        ========================================================== */
 
@@ -46,163 +63,232 @@
        STYLING
        ========================================================== */
 
-    const CSS = `
+    const STYLE_ID =
+        "elgin-gallery-feature-styles";
 
-        .elgin-gallery-feature {
-            width: 100%;
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    if (!document.getElementById(STYLE_ID)) {
 
+        const CSS = `
 
-        .elgin-gallery-feature .elgin-feature-inner {
-            width: 100%;
-            min-height: 360px;
-            max-height: 360px;
+            /* ==================================================
+               OUTER CONTAINER
+               ================================================== */
 
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-
-            margin: 0;
-            padding: 0;
-
-            border: 1px solid #d8d8d8;
-            box-sizing: border-box;
-        }
+            .elgin-gallery-feature {
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
 
-        /* IMAGE */
-
-        .elgin-gallery-feature .elgin-feature-image-wrap {
-            width: 100%;
-            height: 358px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            padding: 2px;
-
-            overflow: hidden;
-            box-sizing: border-box;
-        }
-
-
-        .elgin-gallery-feature .elgin-feature-image {
-            display: block;
-
-            max-width: 100%;
-            max-height: 354px;
-
-            width: auto;
-            height: auto;
-
-            object-fit: contain;
-
-            margin: 0;
-            padding: 0;
-        }
-
-
-        /* TEXT */
-
-        .elgin-gallery-feature .elgin-feature-text {
-            height: 358px;
-
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-
-            box-sizing: border-box;
-
-            padding: 40px 50px;
-
-            border-left: 1px solid #d8d8d8;
-        }
-
-
-        .elgin-gallery-feature .elgin-feature-text p {
-            margin: 0;
-            padding: 0;
-
-            line-height: 1.6;
-        }
-
-
-        /* LINK */
-
-        .elgin-gallery-feature .elgin-feature-text a {
-            display: inline-block;
-
-            margin-top: 22px;
-
-            text-decoration: none;
-
-            font-size: 0.85em;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-        }
-
-
-        .elgin-gallery-feature .elgin-feature-text a:hover {
-            text-decoration: underline;
-        }
-
-
-        /* MOBILE */
-
-        @media screen and (max-width: 767px) {
+            /* ==================================================
+               MAIN FEATURE
+               ================================================== */
 
             .elgin-gallery-feature .elgin-feature-inner {
-                display: block;
 
-                min-height: 0;
-                max-height: none;
+                width: 100%;
+
+                display: grid;
+
+                grid-template-columns:
+                    minmax(0, 1fr)
+                    minmax(0, 1fr);
+
+                margin: 0;
+                padding: 0;
+
+                border: 1px solid #e5e5e5;
+
+                box-sizing: border-box;
             }
 
+
+            /* ==================================================
+               IMAGE COLUMN
+               ================================================== */
 
             .elgin-gallery-feature .elgin-feature-image-wrap {
+
                 width: 100%;
-                height: auto;
 
-                min-height: 300px;
-                max-height: 360px;
+                display: flex;
 
-                border-bottom: 1px solid #d8d8d8;
+                align-items: center;
+                justify-content: center;
+
+                padding: 20px;
+
+                box-sizing: border-box;
+
+                min-width: 0;
             }
 
+
+            /* ==================================================
+               IMAGE
+
+               Maximum artwork size:
+               420px wide
+               500px high
+
+               Aspect ratio is always preserved.
+               ================================================== */
 
             .elgin-gallery-feature .elgin-feature-image {
-                max-width: 100%;
-                max-height: 354px;
-            }
 
+                display: block;
 
-            .elgin-gallery-feature .elgin-feature-text {
-                width: 100%;
+                width: auto;
                 height: auto;
 
-                padding: 35px 30px;
+                max-width: 420px;
+                max-height: 500px;
 
-                border-left: none;
+                object-fit: contain;
+
+                margin: 0;
+                padding: 0;
             }
 
-        }
 
-    `;
+            /* ==================================================
+               TEXT COLUMN
+               ================================================== */
+
+            .elgin-gallery-feature .elgin-feature-text {
+
+                display: flex;
+
+                flex-direction: column;
+
+                justify-content: center;
+
+                box-sizing: border-box;
+
+                padding: 40px 50px;
+
+                border-left: 1px solid #e5e5e5;
+
+                min-width: 0;
+            }
 
 
-    /* ==========================================================
-       ADD STYLES
-       ========================================================== */
+            /* ==================================================
+               TEXT
 
-    const style =
-        document.createElement("style");
+               Inherits the Squarespace site's normal body
+               typography unless overridden by Squarespace.
+               ================================================== */
 
-    style.textContent = CSS;
+            .elgin-gallery-feature .elgin-feature-text p {
 
-    document.head.appendChild(style);
+                margin: 0;
+                padding: 0;
+
+                line-height: 1.6;
+            }
+
+
+            /* ==================================================
+               LINK
+               ================================================== */
+
+            .elgin-gallery-feature .elgin-feature-text a {
+
+                display: inline-block;
+
+                margin-top: 22px;
+
+                text-decoration: none;
+
+                font-size: 0.85em;
+
+                letter-spacing: 0.08em;
+
+                text-transform: uppercase;
+            }
+
+
+            .elgin-gallery-feature .elgin-feature-text a:hover {
+
+                text-decoration: underline;
+            }
+
+
+            /* ==================================================
+               MOBILE
+               ================================================== */
+
+            @media screen and (max-width: 767px) {
+
+                .elgin-gallery-feature .elgin-feature-inner {
+
+                    display: block;
+
+                }
+
+
+                /* IMAGE */
+
+                .elgin-gallery-feature
+                .elgin-feature-image-wrap {
+
+                    width: 100%;
+
+                    min-height: 300px;
+
+                    max-height: 540px;
+
+                    padding: 20px;
+
+                    border-bottom:
+                        1px solid #e5e5e5;
+
+                }
+
+
+                .elgin-gallery-feature
+                .elgin-feature-image {
+
+                    max-width: 100%;
+
+                    max-height: 500px;
+
+                }
+
+
+                /* TEXT */
+
+                .elgin-gallery-feature
+                .elgin-feature-text {
+
+                    width: 100%;
+
+                    height: auto;
+
+                    padding: 35px 30px;
+
+                    border-left: none;
+
+                }
+
+            }
+
+        `;
+
+
+        const style =
+            document.createElement("style");
+
+        style.id = STYLE_ID;
+
+        style.textContent = CSS;
+
+        document.head.appendChild(style);
+
+    }
 
 
     /* ==========================================================
@@ -351,6 +437,7 @@
 
                             return {
                                 url: parts[0],
+
                                 width:
                                     parseInt(
                                         parts[1],
