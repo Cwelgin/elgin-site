@@ -3,7 +3,39 @@ const SHEET_URL =
 
 
 /*
-============================================================
+============================================================const fields = [
+
+    [
+        "atlas",
+        "ATLAS"
+    ],
+
+    [
+        "regime",
+        "RÉGIME"
+    ],
+
+    [
+        "medium",
+        "MEDIUM"
+    ],
+
+    [
+        "dimensions",
+        "DIMENSIONS"
+    ],
+
+    [
+        "date",
+        "DATE"
+    ],
+
+    [
+        "status",
+        "STATUS"
+    ]
+
+];
     artwork.js
     ELGIN Core v3.1.0
     Shared artwork renderer
@@ -141,7 +173,7 @@ const Artwork = {
         );
 
 
-        /* --------------------------------------------------
+               /* --------------------------------------------------
            RENDER SOCIAL LINKS
            -------------------------------------------------- */
 
@@ -162,9 +194,12 @@ const Artwork = {
 
             element.querySelector(
                 ".artwork-image"
-            )
+            ),
+
+            artwork
 
         );
+
 
         /* --------------------------------------------------
            STRUCTURED DATA
@@ -178,10 +213,76 @@ const Artwork = {
 
 
     /******************************************************
+     * BUILD IMAGE ALT TEXT
+     ******************************************************/
+
+    buildImageAlt(artwork){
+
+        const title =
+            artwork.title ||
+            "Artwork";
+
+        const parts = [];
+
+
+        if(artwork.artform){
+
+            parts.push(
+                artwork.artform
+            );
+
+        }
+
+
+        if(artwork.artmedium){
+
+            parts.push(
+                artwork.artmedium
+            );
+
+        }
+
+
+        if(artwork.artworksurface){
+
+            parts.push(
+                `on ${artwork.artworksurface}`
+            );
+
+        }
+
+
+        let alt =
+            `${title} by Cliff Elgin`;
+
+
+        if(parts.length){
+
+            alt +=
+                `, ${parts.join(", ")}`;
+
+        }
+
+
+        if(artwork.startDate){
+
+            alt +=
+                `, ${artwork.startDate}`;
+
+        }
+
+
+        return alt + ".";
+
+    },
+
+
+    /******************************************************
      * LOAD ARTWORK
      ******************************************************/
 
     async loadArtwork(id){
+
 
         const response =
             await fetch(SHEET_URL);
@@ -543,39 +644,49 @@ const Artwork = {
 
     renderMetadata(container, artwork){
 
-        const fields = [
+       const fields = [
 
-            [
-                "atlas",
-                "ATLAS"
-            ],
+    [
+        "atlas",
+        "ATLAS"
+    ],
 
-            [
-                "regime",
-                "RÉGIME"
-            ],
+    [
+        "regime",
+        "RÉGIME"
+    ],
 
-            [
-                "medium",
-                "MEDIUM"
-            ],
+    [
+        "artform",
+        "ARTFORM"
+    ],
 
-            [
-                "dimensions",
-                "DIMENSIONS"
-            ],
+    [
+        "artmedium",
+        "MEDIUM"
+    ],
 
-            [
-                "date",
-                "DATE"
-            ],
+    [
+        "artworksurface",
+        "SURFACE"
+    ],
 
-            [
-                "status",
-                "STATUS"
-            ]
+    [
+        "dimensions",
+        "DIMENSIONS"
+    ],
 
-        ];
+    [
+        "date",
+        "DATE"
+    ],
+
+    [
+        "status",
+        "STATUS"
+    ]
+
+];
 
 
         fields.forEach(
@@ -828,6 +939,17 @@ const Artwork = {
 
 
         /* --------------------------------------------------
+           CONVERT COMMA-SEPARATED FIELDS TO ARRAYS
+           -------------------------------------------------- */
+
+        const mediums =
+            (artwork.artmedium || "")
+                .split(",")
+                .map(value => value.trim())
+                .filter(Boolean);
+
+
+        /* --------------------------------------------------
            BUILD STRUCTURED DATA
            -------------------------------------------------- */
 
@@ -864,11 +986,19 @@ const Artwork = {
             "image":
                 imageUrl,
 
+            "description":
+                artwork.description || undefined,
+
             "artform":
-                "Painting",
+                artwork.artform || undefined,
 
             "artMedium":
-                artwork.medium || undefined,
+                mediums.length
+                    ? mediums
+                    : undefined,
+
+            "artworkSurface":
+                artwork.artworksurface || undefined,
 
             "width":
                 artwork.width
@@ -876,7 +1006,7 @@ const Artwork = {
                         "@type":
                             "QuantitativeValue",
                         "value":
-                            artwork.width,
+                            Number(artwork.width),
                         "unitCode":
                             "INH"
                     }
@@ -888,7 +1018,7 @@ const Artwork = {
                         "@type":
                             "QuantitativeValue",
                         "value":
-                            artwork.height,
+                            Number(artwork.height),
                         "unitCode":
                             "INH"
                     }
@@ -897,10 +1027,21 @@ const Artwork = {
             "dateCreated":
                 artwork.startDate || undefined,
 
+            "locationCreated":
+                artwork.location
+                    ? {
+                        "@type":
+                            "Place",
+                        "name":
+                            artwork.location
+                    }
+                    : undefined,
+
             "keywords":
                 [
                     artwork.atlas,
-                    artwork.regime
+                    artwork.regime,
+                    artwork.series
                 ]
                 .filter(Boolean)
 
@@ -908,14 +1049,33 @@ const Artwork = {
 
 
         /* --------------------------------------------------
+           ADD END DATE AS TEMPORAL COVERAGE
+           -------------------------------------------------- */
+
+        if(
+            artwork.startDate &&
+            artwork.endDate
+        ){
+
+            data.temporalCoverage =
+                `${artwork.startDate}/${artwork.endDate}`;
+
+        }
+
+
+        /* --------------------------------------------------
            REMOVE EMPTY VALUES
            -------------------------------------------------- */
 
-        Object.keys(data).forEach(key=>{
+        Object.keys(data).forEach(key => {
 
             if(
                 data[key] === undefined ||
-                data[key] === ""
+                data[key] === "" ||
+                (
+                    Array.isArray(data[key]) &&
+                    data[key].length === 0
+                )
             ){
 
                 delete data[key];
@@ -946,11 +1106,12 @@ const Artwork = {
         );
 
     },
+
     /******************************************************
      * LOAD HERO IMAGE
      ******************************************************/
 
-    async loadHeroImage(container){
+async loadHeroImage(container, artwork){
 
         try{
 
@@ -1030,7 +1191,10 @@ const Artwork = {
 
             img.src =
                 source;
-
+img.alt =
+    this.buildImageAlt(
+        artwork
+    );
 
             img.loading =
                 "eager";
