@@ -166,6 +166,14 @@ const Artwork = {
 
         );
 
+        /* --------------------------------------------------
+           STRUCTURED DATA
+           -------------------------------------------------- */
+
+        this.addStructuredData(
+            artwork
+        );
+
     },
 
 
@@ -800,7 +808,144 @@ const Artwork = {
 
     },
 
+    /******************************************************
+     * STRUCTURED DATA
+     ******************************************************/
 
+    addStructuredData(artwork){
+
+        /* --------------------------------------------------
+           FIND HERO IMAGE
+           -------------------------------------------------- */
+
+        const image =
+            document.querySelector(
+                ".artwork-image img"
+            );
+
+        const imageUrl =
+            image?.src || "";
+
+
+        /* --------------------------------------------------
+           BUILD STRUCTURED DATA
+           -------------------------------------------------- */
+
+        const data = {
+
+            "@context":
+                "https://schema.org",
+
+            "@type":
+                "VisualArtwork",
+
+            "@id":
+                window.location.href + "#artwork",
+
+            "name":
+                artwork.title,
+
+            "creator": {
+
+                "@type":
+                    "Person",
+
+                "@id":
+                    "https://cliffelgin.com/#person",
+
+                "name":
+                    "Cliff Elgin"
+
+            },
+
+            "url":
+                window.location.href,
+
+            "image":
+                imageUrl,
+
+            "artform":
+                "Painting",
+
+            "artMedium":
+                artwork.medium || undefined,
+
+            "width":
+                artwork.width
+                    ? {
+                        "@type":
+                            "QuantitativeValue",
+                        "value":
+                            artwork.width,
+                        "unitCode":
+                            "INH"
+                    }
+                    : undefined,
+
+            "height":
+                artwork.height
+                    ? {
+                        "@type":
+                            "QuantitativeValue",
+                        "value":
+                            artwork.height,
+                        "unitCode":
+                            "INH"
+                    }
+                    : undefined,
+
+            "dateCreated":
+                artwork.startDate || undefined,
+
+            "keywords":
+                [
+                    artwork.atlas,
+                    artwork.regime
+                ]
+                .filter(Boolean)
+
+        };
+
+
+        /* --------------------------------------------------
+           REMOVE EMPTY VALUES
+           -------------------------------------------------- */
+
+        Object.keys(data).forEach(key=>{
+
+            if(
+                data[key] === undefined ||
+                data[key] === ""
+            ){
+
+                delete data[key];
+
+            }
+
+        });
+
+
+        /* --------------------------------------------------
+           CREATE JSON-LD
+           -------------------------------------------------- */
+
+        const script =
+            document.createElement(
+                "script"
+            );
+
+        script.type =
+            "application/ld+json";
+
+        script.textContent =
+            JSON.stringify(data);
+
+
+        document.head.appendChild(
+            script
+        );
+
+    },
     /******************************************************
      * LOAD HERO IMAGE
      ******************************************************/
