@@ -1,151 +1,23 @@
 (function () {
 
-    if (window.ElginGalleryFeature) return;
+    const script = document.currentScript;
+    const container = script.previousElementSibling;
 
-    function init() {
-
-        const containers = document.querySelectorAll(
-            ".elgin-gallery-feature"
-        );
-
-        containers.forEach(function (container) {
-
-            if (container.dataset.elginLoaded === "true") return;
-
-            container.dataset.elginLoaded = "true";
-
-            const sourcePage =
-                container.getAttribute("data-source");
-
-            const text =
-                container.innerHTML;
-
-            if (!sourcePage) return;
-
-            container.innerHTML = "";
-
-            container.style.visibility = "hidden";
-
-            fetch(sourcePage)
-                .then(function (response) {
-                    if (!response.ok) {
-                        throw new Error("Could not load source page.");
-                    }
-                    return response.text();
-                })
-
-                .then(function (html) {
-
-                    const doc =
-                        new DOMParser().parseFromString(
-                            html,
-                            "text/html"
-                        );
-
-                    const gallery =
-                        doc.querySelector(
-                            ".sqs-gallery-container .sqs-gallery"
-                        );
-
-                    if (!gallery) {
-                        throw new Error("Gallery not found.");
-                    }
-
-                    const items =
-                        gallery.querySelectorAll(
-                            ".sqs-gallery-design-grid-slide, .slide"
-                        );
-
-                    if (!items.length) {
-                        throw new Error("No gallery images found.");
-                    }
-
-                    const lastItem =
-                        items[items.length - 1];
-
-                    const image =
-                        lastItem.querySelector("img");
-
-                    if (!image) {
-                        throw new Error("Image not found.");
-                    }
-
-                    let imageURL =
-                        image.getAttribute("data-src") ||
-                        image.getAttribute("src");
-
-                    const srcset =
-                        image.getAttribute("data-srcset") ||
-                        image.getAttribute("srcset");
-
-                    if (srcset) {
-
-                        const sources = srcset
-                            .split(",")
-                            .map(function (source) {
-
-                                const parts =
-                                    source.trim().split(/\s+/);
-
-                                return {
-                                    url: parts[0],
-                                    width:
-                                        parseInt(parts[1], 10) || 0
-                                };
-
-                            })
-                            .sort(function (a, b) {
-                                return b.width - a.width;
-                            });
-
-                        if (sources.length) {
-                            imageURL = sources[0].url;
-                        }
-                    }
-
-                    container.innerHTML = `
-
-                        <div class="elgin-feature-inner">
-
-                            <div class="elgin-feature-image-wrap">
-                                <img
-                                    class="elgin-feature-image"
-                                    src="${imageURL}"
-                                    alt=""
-                                >
-                            </div>
-
-                            <div class="elgin-feature-text">
-                                ${text}
-                            </div>
-
-                        </div>
-
-                    `;
-
-                    container.style.visibility = "visible";
-
-                })
-
-                .catch(function (error) {
-
-                    console.error(
-                        "ELGIN Gallery Feature:",
-                        error
-                    );
-
-                    container.innerHTML = "";
-                    container.style.visibility = "visible";
-
-                });
-
-        });
+    if (!container ||
+        !container.classList.contains("elgin-gallery-feature")) {
+        console.error("ELGIN: Feature container not found.");
+        return;
     }
 
+    const sourcePage = container.getAttribute("data-source");
+    const text = container.innerHTML;
 
-    const style = document.createElement("style");
+    if (!sourcePage) {
+        console.error("ELGIN: No data-source specified.");
+        return;
+    }
 
-    style.textContent = `
+    const CSS = `
 
         .elgin-gallery-feature {
             width: 100%;
@@ -190,12 +62,12 @@
             flex-direction: column;
             justify-content: center;
             box-sizing: border-box;
+            border-left: 1px solid #d8d8d8;
         }
 
         .elgin-feature-text p {
             margin: 0;
             padding: 0;
-            font-size: 16px;
             line-height: 1.6;
         }
 
@@ -204,7 +76,6 @@
             margin-top: 22px;
             text-decoration: none;
             font-size: 12px;
-            font-weight: 500;
             letter-spacing: .10em;
             text-transform: uppercase;
         }
@@ -231,16 +102,141 @@
                 width: 100%;
                 height: auto;
                 padding: 35px 30px;
+                border-left: none;
             }
 
         }
 
     `;
 
+    const style = document.createElement("style");
+    style.textContent = CSS;
     document.head.appendChild(style);
 
-    window.ElginGalleryFeature = {
-        init: init
-    };
+    container.style.visibility = "hidden";
+
+    fetch(sourcePage)
+
+        .then(function (response) {
+
+            if (!response.ok) {
+                throw new Error("Could not load source page.");
+            }
+
+            return response.text();
+
+        })
+
+        .then(function (html) {
+
+            const doc =
+                new DOMParser().parseFromString(
+                    html,
+                    "text/html"
+                );
+
+            const gallery =
+                doc.querySelector(
+                    ".sqs-gallery-container .sqs-gallery"
+                );
+
+            if (!gallery) {
+                throw new Error("Gallery not found.");
+            }
+
+            const items =
+                gallery.querySelectorAll(
+                    ".sqs-gallery-design-grid-slide, .slide"
+                );
+
+            if (!items.length) {
+                throw new Error("No gallery images found.");
+            }
+
+            const finalItem =
+                items[items.length - 1];
+
+            const image =
+                finalItem.querySelector("img");
+
+            if (!image) {
+                throw new Error("Final gallery image not found.");
+            }
+
+            let imageURL =
+                image.getAttribute("data-src") ||
+                image.getAttribute("src");
+
+            const srcset =
+                image.getAttribute("data-srcset") ||
+                image.getAttribute("srcset");
+
+            if (srcset) {
+
+                const sources =
+                    srcset
+                        .split(",")
+                        .map(function (source) {
+
+                            const parts =
+                                source.trim().split(/\s+/);
+
+                            return {
+                                url: parts[0],
+                                width:
+                                    parseInt(parts[1], 10) || 0
+                            };
+
+                        })
+                        .sort(function (a, b) {
+                            return b.width - a.width;
+                        });
+
+                if (sources.length) {
+                    imageURL = sources[0].url;
+                }
+
+            }
+
+            container.innerHTML = `
+
+                <div class="elgin-feature-inner">
+
+                    <div class="elgin-feature-image-wrap">
+
+                        <img
+                            class="elgin-feature-image"
+                            src="${imageURL}"
+                            alt=""
+                        >
+
+                    </div>
+
+                    <div class="elgin-feature-text">
+
+                        ${text}
+
+                    </div>
+
+                </div>
+
+            `;
+
+            container.style.visibility = "visible";
+
+        })
+
+        .catch(function (error) {
+
+            console.error(
+                "ELGIN Gallery Feature:",
+                error
+            );
+
+            container.innerHTML = "";
+
+            container.style.visibility = "visible";
+
+        });
 
 })();
