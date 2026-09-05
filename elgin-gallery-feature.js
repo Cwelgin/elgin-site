@@ -1,390 +1,151 @@
 (function () {
 
-    /*
-    ============================================================
-    ELGIN GALLERY FEATURE
-    ============================================================
+    if (window.ElginGalleryFeature) return;
 
-    Squarespace page usage:
+    function init() {
 
-    <div class="elgin-gallery-feature"
-         data-source="/artwork/nocturne-pour-piano">
-
-        <p>
-            Your description goes here.
-            <br><br>
-            More description here.
-        </p>
-
-        <a href="/artwork/nocturne-pour-piano">read more here</a>
-
-    </div>
-
-    The script:
-    1. Finds every .elgin-gallery-feature on the page
-    2. Reads its data-source
-    3. Loads that Squarespace page
-    4. Finds the gallery
-    5. Takes the LAST image in the gallery
-    6. Displays that image beside the supplied text
-    ============================================================
-    */
-
-
-    /* ==========================================================
-       FIND ALL FEATURE BLOCKS
-       ========================================================== */
-
-    function initializeGalleryFeatures() {
-
-        const containers =
-            document.querySelectorAll(".elgin-gallery-feature");
-
-        if (!containers.length) {
-            return;
-        }
-
+        const containers = document.querySelectorAll(
+            ".elgin-gallery-feature"
+        );
 
         containers.forEach(function (container) {
 
-            loadGalleryFeature(container);
+            if (container.dataset.elginLoaded === "true") return;
 
-        });
+            container.dataset.elginLoaded = "true";
 
-    }
+            const sourcePage =
+                container.getAttribute("data-source");
 
+            const text =
+                container.innerHTML;
 
-    /* ==========================================================
-       LOAD ONE GALLERY FEATURE
-       ========================================================== */
+            if (!sourcePage) return;
 
-    function loadGalleryFeature(container) {
+            container.innerHTML = "";
 
-        const SOURCE_PAGE =
-            container.getAttribute("data-source");
+            container.style.visibility = "hidden";
 
-        const TEXT =
-            container.innerHTML;
+            fetch(sourcePage)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Could not load source page.");
+                    }
+                    return response.text();
+                })
 
+                .then(function (html) {
 
-        if (!SOURCE_PAGE) {
+                    const doc =
+                        new DOMParser().parseFromString(
+                            html,
+                            "text/html"
+                        );
 
-            console.error(
-                "ELGIN: No data-source specified."
-            );
+                    const gallery =
+                        doc.querySelector(
+                            ".sqs-gallery-container .sqs-gallery"
+                        );
 
-            container.innerHTML =
-                "<p>ELGIN Gallery Feature: No source page specified.</p>";
+                    if (!gallery) {
+                        throw new Error("Gallery not found.");
+                    }
 
-            return;
+                    const items =
+                        gallery.querySelectorAll(
+                            ".sqs-gallery-design-grid-slide, .slide"
+                        );
 
-        }
+                    if (!items.length) {
+                        throw new Error("No gallery images found.");
+                    }
 
+                    const lastItem =
+                        items[items.length - 1];
 
-        /* ======================================================
-           TEMPORARILY HIDE ORIGINAL CONTENT
-           ====================================================== */
+                    const image =
+                        lastItem.querySelector("img");
 
-        container.style.visibility = "hidden";
+                    if (!image) {
+                        throw new Error("Image not found.");
+                    }
 
+                    let imageURL =
+                        image.getAttribute("data-src") ||
+                        image.getAttribute("src");
 
-        /* ======================================================
-           LOAD SOURCE PAGE
-           ====================================================== */
+                    const srcset =
+                        image.getAttribute("data-srcset") ||
+                        image.getAttribute("srcset");
 
-        fetch(SOURCE_PAGE)
+                    if (srcset) {
 
-            .then(function (response) {
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Could not load source page: " +
-                        response.status
-                    );
-
-                }
-
-                return response.text();
-
-            })
-
-
-            /* ==================================================
-               PARSE SOURCE PAGE
-               ================================================== */
-
-            .then(function (html) {
-
-                const parser =
-                    new DOMParser();
-
-                const sourceDocument =
-                    parser.parseFromString(
-                        html,
-                        "text/html"
-                    );
-
-
-                /* ==============================================
-                   FIND SQUARESPACE GALLERY
-                   ============================================== */
-
-                const gallery =
-                    sourceDocument.querySelector(
-                        ".sqs-gallery-container .sqs-gallery"
-                    );
-
-
-                if (!gallery) {
-
-                    console.error(
-                        "ELGIN: Squarespace gallery not found:",
-                        SOURCE_PAGE
-                    );
-
-                    container.innerHTML =
-                        "<p>Gallery not found.</p>";
-
-                    container.style.visibility = "visible";
-
-                    return;
-
-                }
-
-
-                /* ==============================================
-                   FIND GALLERY ITEMS
-                   ============================================== */
-
-                const galleryItems =
-                    gallery.querySelectorAll(
-                        ".sqs-gallery-design-grid-slide, .slide"
-                    );
-
-
-                if (!galleryItems.length) {
-
-                    console.error(
-                        "ELGIN: No gallery items found:",
-                        SOURCE_PAGE
-                    );
-
-                    container.innerHTML =
-                        "<p>No gallery images found.</p>";
-
-                    container.style.visibility = "visible";
-
-                    return;
-
-                }
-
-
-                /* ==============================================
-                   GET FINAL GALLERY ITEM
-                   ============================================== */
-
-                const finalItem =
-                    galleryItems[
-                        galleryItems.length - 1
-                    ];
-
-
-                /* ==============================================
-                   FIND IMAGE
-                   ============================================== */
-
-                const image =
-                    finalItem.querySelector("img");
-
-
-                if (!image) {
-
-                    console.error(
-                        "ELGIN: No image found in final gallery item:",
-                        SOURCE_PAGE
-                    );
-
-                    container.innerHTML =
-                        "<p>Final gallery image not found.</p>";
-
-                    container.style.visibility = "visible";
-
-                    return;
-
-                }
-
-
-                /* ==============================================
-                   GET BEST IMAGE URL
-                   ============================================== */
-
-                let imageURL =
-                    image.getAttribute("data-src") ||
-                    image.getAttribute("src");
-
-
-                const srcset =
-                    image.getAttribute("data-srcset") ||
-                    image.getAttribute("srcset");
-
-
-                if (srcset) {
-
-                    const sources =
-                        srcset
+                        const sources = srcset
                             .split(",")
                             .map(function (source) {
 
                                 const parts =
-                                    source
-                                        .trim()
-                                        .split(/\s+/);
+                                    source.trim().split(/\s+/);
 
                                 return {
                                     url: parts[0],
                                     width:
-                                        parseInt(
-                                            parts[1],
-                                            10
-                                        ) || 0
+                                        parseInt(parts[1], 10) || 0
                                 };
 
                             })
                             .sort(function (a, b) {
-
                                 return b.width - a.width;
-
                             });
 
-
-                    if (sources.length) {
-
-                        imageURL =
-                            sources[0].url;
-
+                        if (sources.length) {
+                            imageURL = sources[0].url;
+                        }
                     }
 
-                }
+                    container.innerHTML = `
 
+                        <div class="elgin-feature-inner">
 
-                /* ==============================================
-                   CHECK IMAGE URL
-                   ============================================== */
+                            <div class="elgin-feature-image-wrap">
+                                <img
+                                    class="elgin-feature-image"
+                                    src="${imageURL}"
+                                    alt=""
+                                >
+                            </div>
 
-                if (!imageURL) {
+                            <div class="elgin-feature-text">
+                                ${text}
+                            </div>
 
-                    console.error(
-                        "ELGIN: Could not determine image URL:",
-                        SOURCE_PAGE
-                    );
+                        </div>
 
-                    container.innerHTML =
-                        "<p>Image URL not found.</p>";
+                    `;
 
                     container.style.visibility = "visible";
 
-                    return;
+                })
 
-                }
+                .catch(function (error) {
 
+                    console.error(
+                        "ELGIN Gallery Feature:",
+                        error
+                    );
 
-                /* ==============================================
-                   CREATE FEATURE
-                   ============================================== */
+                    container.innerHTML = "";
+                    container.style.visibility = "visible";
 
-                container.innerHTML = `
+                });
 
-                    <div class="elgin-feature-inner">
-
-                        <div class="elgin-feature-image-wrap">
-
-                            <img
-                                class="elgin-feature-image"
-                                src="${imageURL}"
-                                alt=""
-                            >
-
-                        </div>
-
-
-                        <div class="elgin-feature-text">
-
-                            ${TEXT}
-
-                        </div>
-
-                    </div>
-
-                `;
-
-
-                /* ==============================================
-                   SHOW FEATURE
-                   ============================================== */
-
-                container.style.visibility = "visible";
-
-
-                /* ==============================================
-                   DEBUGGING
-                   ============================================== */
-
-                console.log(
-                    "ELGIN: Gallery feature loaded:",
-                    SOURCE_PAGE
-                );
-
-                console.log(
-                    "ELGIN: Gallery images:",
-                    galleryItems.length
-                );
-
-                console.log(
-                    "ELGIN: Final image:",
-                    imageURL
-                );
-
-            })
-
-
-            /* ==================================================
-               ERROR HANDLING
-               ================================================== */
-
-            .catch(function (error) {
-
-                console.error(
-                    "ELGIN Gallery Feature:",
-                    error
-                );
-
-                container.innerHTML = `
-
-                    <p style="
-                        font-size: 12px;
-                        margin: 0;
-                    ">
-
-                        ELGIN Gallery Feature Error:
-                        ${error.message}
-
-                    </p>
-
-                `;
-
-                container.style.visibility = "visible";
-
-            });
-
+        });
     }
 
 
-    /* ==========================================================
-       STYLING
-       ========================================================== */
+    const style = document.createElement("style");
 
-    const CSS = `
+    style.textContent = `
 
         .elgin-gallery-feature {
             width: 100%;
@@ -393,223 +154,93 @@
             box-sizing: border-box;
         }
 
-
-        .elgin-gallery-feature .elgin-feature-inner {
-
+        .elgin-feature-inner {
             width: 100%;
-
-            min-height: 360px;
-            max-height: 360px;
-
+            height: 360px;
             display: grid;
-
             grid-template-columns: 1fr 1fr;
-
-            margin: 0;
-            padding: 0;
-
             border: 1px solid #d8d8d8;
-
             box-sizing: border-box;
-
         }
 
-
-        /* ======================================================
-           IMAGE
-           ====================================================== */
-
-        .elgin-gallery-feature .elgin-feature-image-wrap {
-
+        .elgin-feature-image-wrap {
             width: 100%;
             height: 358px;
-
             display: flex;
-
             align-items: center;
             justify-content: center;
-
-            padding: 2px;
-
             overflow: hidden;
-
+            padding: 2px;
             box-sizing: border-box;
-
-            min-width: 0;
-
         }
 
-
-        .elgin-gallery-feature .elgin-feature-image {
-
-            display: block !important;
-
-            max-width: 100% !important;
-            max-height: 354px !important;
-
-            width: auto !important;
-            height: auto !important;
-
-            object-fit: contain !important;
-
-            margin: 0 !important;
-            padding: 0 !important;
-
-            min-width: 0 !important;
-            min-height: 0 !important;
-
-            flex: 0 1 auto !important;
-
+        .elgin-feature-image {
+            display: block;
+            max-width: 100%;
+            max-height: 354px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
         }
 
-
-        /* ======================================================
-           TEXT
-           ====================================================== */
-
-        .elgin-gallery-feature .elgin-feature-text {
-
+        .elgin-feature-text {
             height: 358px;
-
-            display: flex;
-
-            flex-direction: column;
-
-            justify-content: center;
-
-            box-sizing: border-box;
-
             padding: 40px 50px;
-
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-sizing: border-box;
         }
 
-
-        .elgin-gallery-feature .elgin-feature-text p {
-
+        .elgin-feature-text p {
             margin: 0;
             padding: 0;
-
             font-size: 16px;
-
             line-height: 1.6;
-
         }
 
-
-        /* ======================================================
-           LINK
-           ====================================================== */
-
-        .elgin-gallery-feature .elgin-feature-text a {
-
+        .elgin-feature-text a {
             display: inline-block;
-
             margin-top: 22px;
-
             text-decoration: none;
-
             font-size: 12px;
-
             font-weight: 500;
-
-            letter-spacing: 0.10em;
-
+            letter-spacing: .10em;
             text-transform: uppercase;
-
         }
 
-
-        .elgin-gallery-feature .elgin-feature-text a:hover {
-
+        .elgin-feature-text a:hover {
             text-decoration: underline;
-
         }
-
-
-        /* ======================================================
-           MOBILE
-           ====================================================== */
 
         @media screen and (max-width: 767px) {
 
-            .elgin-gallery-feature .elgin-feature-inner {
-
+            .elgin-feature-inner {
+                height: auto;
                 display: block;
-
-                min-height: 0;
-                max-height: none;
-
             }
 
-
-            .elgin-gallery-feature .elgin-feature-image-wrap {
-
+            .elgin-feature-image-wrap {
                 width: 100%;
-
-                height: auto;
-
+                height: 360px;
                 min-height: 300px;
-                max-height: 360px;
-
                 border-bottom: 1px solid #d8d8d8;
-
             }
 
-
-            .elgin-gallery-feature .elgin-feature-image {
-
-                max-width: 100% !important;
-
-                max-height: 354px !important;
-
-            }
-
-
-            .elgin-gallery-feature .elgin-feature-text {
-
+            .elgin-feature-text {
                 width: 100%;
-
                 height: auto;
-
                 padding: 35px 30px;
-
-                border-left: none;
-
             }
 
         }
 
     `;
 
-
-    /* ==========================================================
-       ADD STYLES TO PAGE
-       ========================================================== */
-
-    const style =
-        document.createElement("style");
-
-    style.textContent = CSS;
-
     document.head.appendChild(style);
 
-
-    /* ==========================================================
-       INITIALIZE
-       ========================================================== */
-
-    if (document.readyState === "loading") {
-
-        document.addEventListener(
-            "DOMContentLoaded",
-            initializeGalleryFeatures
-        );
-
-    } else {
-
-        initializeGalleryFeatures();
-
-    }
-
+    window.ElginGalleryFeature = {
+        init: init
+    };
 
 })();
