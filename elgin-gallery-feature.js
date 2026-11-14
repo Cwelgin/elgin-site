@@ -222,26 +222,30 @@ Squarespace usage:
             .then(html => {
                 const doc = new DOMParser().parseFromString(html, "text/html");
 
-                // Squarespace 7.1 gallery blocks on this site are separate
-                // block elements. Each gallery block has its own ID and
-                // contains slides marked .slide[data-type="image"].
+                // IMPORTANT: Select only actual Squarespace gallery blocks.
+                // Do not use div[id^="block-"] here: that also matches
+                // surrounding layout/section blocks that contain galleries.
                 const galleryBlocks = Array.from(
-                    doc.querySelectorAll('div[id^="block-"]')
+                    doc.querySelectorAll(
+                        'div.sqs-block.gallery-block.sqs-block-gallery[data-sqsp-block="gallery"]'
+                    )
                 ).filter(block =>
-                    block.querySelector('.slide[data-type="image"] img')
+                    block.querySelector('.sqs-gallery > .slide[data-type="image"] img')
                 );
 
                 if (!galleryBlocks.length) {
                     throw new Error("No Squarespace gallery blocks containing images were found on " + sourcePage);
                 }
 
-                // Use the last gallery block in document order.
+                // Use the last actual gallery block in document order.
                 const finalGallery = galleryBlocks[galleryBlocks.length - 1];
 
-                // Within that gallery, use the last image slide.
-                const imageSlides = finalGallery.querySelectorAll(
-                    '.slide[data-type="image"]'
-                );
+                // Limit the search to the gallery's own .sqs-gallery so nested
+                // or surrounding content cannot affect slide selection.
+                const gallery = finalGallery.querySelector('.sqs-block-content > .sqs-gallery-container > .sqs-gallery');
+                const imageSlides = gallery
+                    ? gallery.querySelectorAll(':scope > .slide[data-type="image"]')
+                    : [];
 
                 const finalSlide = imageSlides[imageSlides.length - 1];
                 const image = finalSlide
