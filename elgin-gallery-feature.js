@@ -3,9 +3,11 @@
 ELGIN Gallery Feature
 Shared data-driven Squarespace component
 
-Squarespace usage:
+Squarespace usage — one artwork:
 <div class="elgin-feature" data-id="V001"></div>
-<div class="elgin-feature" data-id="OBJ007"></div>
+
+Squarespace usage — multiple artworks in one Code Block:
+<div class="elgin-feature-list" data-ids="V001,OBJ007,AA011"></div>
 ============================================================
 */
 
@@ -14,6 +16,7 @@ Squarespace usage:
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwsxbrVU3irqM75ymKLk4tsevplEDWWUUXKzLI6xHpn-psauODtWKghJyM2mqQS2ij0/exec";
     const SELECTOR = ".elgin-feature";
+    const LIST_SELECTOR = ".elgin-feature-list";
     const STYLE_ID = "elgin-gallery-feature-styles";
     const artworkCache = new Map();
     const imageCache = new Map();
@@ -24,6 +27,15 @@ Squarespace usage:
         const style = document.createElement("style");
         style.id = STYLE_ID;
         style.textContent = `
+            .elgin-feature-list {
+                display: flex;
+                flex-direction: column;
+                gap: 32px;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
             .elgin-feature {
                 width: 100%;
                 margin: 0;
@@ -306,6 +318,39 @@ Squarespace usage:
         container.removeAttribute("aria-busy");
     }
 
+    async function initializeList(container) {
+        if (container.dataset.elginFeatureListInitialized === "true") return;
+
+        const ids = (container.getAttribute("data-ids") || "")
+            .split(",")
+            .map(id => id.trim())
+            .filter(Boolean);
+
+        if (!ids.length) {
+            showStatus(container, "ELGIN Feature List: add comma-separated artwork IDs to data-ids.", true);
+            console.error("ELGIN Feature List: no artwork IDs were provided.", container);
+            return;
+        }
+
+        container.dataset.elginFeatureListInitialized = "true";
+        container.replaceChildren();
+
+        const featureBlocks = ids.map(id => {
+            const feature = document.createElement("div");
+            feature.className = "elgin-feature";
+            feature.setAttribute("data-id", id);
+            container.appendChild(feature);
+            return feature;
+        });
+
+        // Load a small batch at a time to avoid sending 30 requests simultaneously.
+        const batchSize = 4;
+        for (let index = 0; index < featureBlocks.length; index += batchSize) {
+            const batch = featureBlocks.slice(index, index + batchSize);
+            await Promise.all(batch.map(initializeFeature));
+        }
+    }
+
     async function initializeFeature(container) {
         if (container.dataset.elginFeatureInitialized === "true") return;
 
@@ -351,6 +396,12 @@ Squarespace usage:
     function initializeAll() {
         addStyles();
 
+        // Expand each multi-artwork list into individual feature rows.
+        document.querySelectorAll(LIST_SELECTOR).forEach(container => {
+            initializeList(container);
+        });
+
+        // Also retain support for existing single-artwork Code Blocks.
         document.querySelectorAll(SELECTOR).forEach(container => {
             initializeFeature(container);
         });
@@ -374,7 +425,12 @@ Squarespace usage:
             for (const node of mutation.addedNodes) {
                 if (node.nodeType !== 1) continue;
 
-                if (node.matches(SELECTOR) || node.querySelector(SELECTOR)) {
+                if (
+                    node.matches(SELECTOR) ||
+                    node.matches(LIST_SELECTOR) ||
+                    node.querySelector(SELECTOR) ||
+                    node.querySelector(LIST_SELECTOR)
+                ) {
                     shouldScan = true;
                     break;
                 }
