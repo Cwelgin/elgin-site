@@ -1,10 +1,12 @@
 /*
+============================================================
 ELGIN Gallery Feature
-Shared data-driven component.
+Shared data-driven Squarespace component
 
 Squarespace usage:
 <div class="elgin-feature" data-id="V001"></div>
 <div class="elgin-feature" data-id="OBJ007"></div>
+============================================================
 */
 
 (function () {
@@ -13,7 +15,6 @@ Squarespace usage:
     const API_URL = "https://script.google.com/macros/s/AKfycbwsxbrVU3irqM75ymKLk4tsevplEDWWUUXKzLI6xHpn-psauODtWKghJyM2mqQS2ij0/exec";
     const SELECTOR = ".elgin-feature";
     const STYLE_ID = "elgin-gallery-feature-styles";
-
     const artworkCache = new Map();
     const imageCache = new Map();
 
@@ -29,19 +30,17 @@ Squarespace usage:
                 padding: 0;
                 box-sizing: border-box;
             }
-
-            .elgin-feature .elgin-feature-inner {
+            .elgin-feature-inner {
                 width: 100%;
-                height: 360px;
+                min-height: 360px;
                 display: grid;
                 grid-template-columns: 1fr 1fr;
                 border: 1px solid #d8d8d8;
                 box-sizing: border-box;
             }
-
-            .elgin-feature .elgin-feature-image-wrap {
+            .elgin-feature-image-wrap {
                 width: 100%;
-                height: 358px;
+                min-height: 358px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -49,8 +48,7 @@ Squarespace usage:
                 padding: 2px;
                 box-sizing: border-box;
             }
-
-            .elgin-feature .elgin-feature-image {
+            .elgin-feature-image {
                 display: block;
                 max-width: 100%;
                 max-height: 354px;
@@ -58,9 +56,8 @@ Squarespace usage:
                 height: auto;
                 object-fit: contain;
             }
-
-            .elgin-feature .elgin-feature-text {
-                height: 358px;
+            .elgin-feature-text {
+                min-height: 358px;
                 padding: 40px 50px;
                 display: flex;
                 flex-direction: column;
@@ -68,20 +65,17 @@ Squarespace usage:
                 box-sizing: border-box;
                 border-left: 1px solid #d8d8d8;
             }
-
-            .elgin-feature .elgin-feature-title {
+            .elgin-feature-title {
                 margin: 0 0 14px;
                 padding: 0;
             }
-
-            .elgin-feature .elgin-feature-description {
+            .elgin-feature-description {
                 margin: 0;
                 padding: 0;
                 line-height: 1.6;
                 white-space: pre-line;
             }
-
-            .elgin-feature .elgin-feature-link {
+            .elgin-feature-link {
                 display: inline-block;
                 align-self: flex-start;
                 margin-top: 22px;
@@ -90,33 +84,45 @@ Squarespace usage:
                 letter-spacing: .10em;
                 text-transform: uppercase;
             }
-
-            .elgin-feature .elgin-feature-link:hover {
+            .elgin-feature-link:hover {
                 text-decoration: underline;
             }
-
+            .elgin-feature-status {
+                margin: 12px 0;
+                font-size: 13px;
+                line-height: 1.5;
+            }
             @media screen and (max-width: 767px) {
-                .elgin-feature .elgin-feature-inner {
-                    height: auto;
+                .elgin-feature-inner {
+                    min-height: 0;
                     display: block;
                 }
-
-                .elgin-feature .elgin-feature-image-wrap {
+                .elgin-feature-image-wrap {
                     width: 100%;
                     height: 360px;
                     min-height: 300px;
                     border-bottom: 1px solid #d8d8d8;
                 }
-
-                .elgin-feature .elgin-feature-text {
+                .elgin-feature-text {
                     width: 100%;
-                    height: auto;
+                    min-height: 0;
                     padding: 35px 30px;
                     border-left: none;
                 }
             }
         `;
         document.head.appendChild(style);
+    }
+
+    function showStatus(container, message, isError) {
+        container.replaceChildren();
+        const status = document.createElement("p");
+        status.className = "elgin-feature-status";
+        status.textContent = message;
+        if (isError) status.setAttribute("role", "alert");
+        container.appendChild(status);
+        container.style.visibility = "visible";
+        container.removeAttribute("aria-busy");
     }
 
     function loadArtwork(id) {
@@ -128,17 +134,27 @@ Squarespace usage:
             const script = document.createElement("script");
             let finished = false;
 
+            const timeout = window.setTimeout(() => {
+                cleanup();
+                reject(new Error("The artwork API did not respond in time for ID " + id + "."));
+            }, 15000);
+
             function cleanup() {
                 if (finished) return;
                 finished = true;
-                delete window[callbackName];
+                window.clearTimeout(timeout);
+                try {
+                    delete window[callbackName];
+                } catch (error) {
+                    window[callbackName] = undefined;
+                }
                 script.remove();
             }
 
             window[callbackName] = function (record) {
                 cleanup();
                 if (!record) {
-                    reject(new Error("No artwork record found for ID: " + id));
+                    reject(new Error("No spreadsheet record was found for artwork ID " + id + "."));
                     return;
                 }
                 resolve(record);
@@ -146,7 +162,7 @@ Squarespace usage:
 
             script.onerror = function () {
                 cleanup();
-                reject(new Error("Could not retrieve artwork data for ID: " + id));
+                reject(new Error("The browser could not contact the Google Sheets artwork API."));
             };
 
             script.src = API_URL +
@@ -161,47 +177,77 @@ Squarespace usage:
         return promise;
     }
 
+    function extractImageURL(image, sourcePage) {
+        if (!image) return "";
+
+        const candidates = [
+            image.getAttribute("data-src"),
+            image.getAttribute("data-image"),
+            image.getAttribute("src")
+        ].filter(Boolean);
+
+        const srcset = image.getAttribute("data-srcset") || image.getAttribute("srcset");
+
+        if (srcset) {
+            const largest = srcset.split(",").map(part => {
+                const pieces = part.trim().split(/\s+/);
+                return {
+                    url: pieces[0],
+                    width: parseInt(pieces[1], 10) || 0
+                };
+            }).sort((a, b) => b.width - a.width)[0];
+
+            if (largest && largest.url) candidates.unshift(largest.url);
+        }
+
+        return candidates.length
+            ? new URL(candidates[0], sourcePage).href
+            : "";
+    }
+
     function getFinalGalleryImage(sourcePage) {
         if (imageCache.has(sourcePage)) return imageCache.get(sourcePage);
 
-        const promise = fetch(sourcePage)
+        const promise = fetch(sourcePage, {
+            method: "GET",
+            credentials: "same-origin",
+            redirect: "follow"
+        })
             .then(response => {
                 if (!response.ok) {
-                    throw new Error("Could not load source page: " + response.status);
+                    throw new Error("Artwork page returned HTTP " + response.status + ".");
                 }
                 return response.text();
             })
             .then(html => {
                 const doc = new DOMParser().parseFromString(html, "text/html");
+
                 const gallery = doc.querySelector(
-                    ".sqs-gallery-container .sqs-gallery"
+                    ".sqs-gallery-container .sqs-gallery, .sqs-gallery, [data-controller*='Gallery']"
                 );
 
-                if (!gallery) throw new Error("Squarespace gallery not found: " + sourcePage);
-
-                const items = gallery.querySelectorAll(
-                    ".sqs-gallery-design-grid-slide, .slide"
-                );
-
-                if (!items.length) throw new Error("No gallery images found: " + sourcePage);
-
-                const image = items[items.length - 1].querySelector("img");
-                if (!image) throw new Error("Final gallery image not found: " + sourcePage);
-
-                let imageURL = image.getAttribute("data-src") || image.getAttribute("src");
-                const srcset = image.getAttribute("data-srcset") || image.getAttribute("srcset");
-
-                if (srcset) {
-                    const sources = srcset.split(",").map(source => {
-                        const parts = source.trim().split(/\s+/);
-                        return { url: parts[0], width: parseInt(parts[1], 10) || 0 };
-                    }).sort((a, b) => b.width - a.width);
-
-                    if (sources.length) imageURL = sources[0].url;
+                if (!gallery) {
+                    throw new Error("No Squarespace gallery was found on " + sourcePage);
                 }
 
-                if (!imageURL) throw new Error("Could not determine final gallery image URL.");
-                return new URL(imageURL, sourcePage).href;
+                const items = gallery.querySelectorAll(
+                    ".sqs-gallery-design-grid-slide, .slide, .gallery-grid-item, .gallery-item"
+                );
+
+                if (!items.length) {
+                    throw new Error("The artwork page gallery contains no images.");
+                }
+
+                // Use the final gallery item, matching the established ELGIN feature behavior.
+                const finalItem = items[items.length - 1];
+                const image = finalItem.querySelector("img");
+                const imageURL = extractImageURL(image, sourcePage);
+
+                if (!imageURL) {
+                    throw new Error("The final gallery image has no usable image URL.");
+                }
+
+                return imageURL;
             });
 
         imageCache.set(sourcePage, promise);
@@ -221,6 +267,12 @@ Squarespace usage:
         image.src = imageURL;
         image.alt = artwork.title || "";
         image.loading = "lazy";
+
+        image.onerror = () => {
+            image.alt = (artwork.title || "Artwork") + " image could not be displayed";
+            console.error("ELGIN Feature: image failed to load:", imageURL);
+        };
+
         imageWrap.appendChild(image);
 
         const textWrap = document.createElement("div");
@@ -258,64 +310,91 @@ Squarespace usage:
         if (container.dataset.elginFeatureInitialized === "true") return;
 
         const id = (container.getAttribute("data-id") || "").trim();
+
         if (!id) {
-            console.error("ELGIN Feature: Missing data-id.", container);
+            showStatus(container, "ELGIN Feature: add a data-id to this block.", true);
+            console.error("ELGIN Feature: missing data-id.", container);
             return;
         }
 
         container.dataset.elginFeatureInitialized = "true";
-        container.style.visibility = "hidden";
+        container.style.visibility = "visible";
         container.setAttribute("aria-busy", "true");
+        showStatus(container, "Loading artwork " + id + "…", false);
 
         try {
             const artwork = await loadArtwork(id);
-            if (!artwork.urlSlug) throw new Error("Artwork record has no urlSlug: " + id);
+
+            if (!artwork.urlSlug) {
+                throw new Error("The spreadsheet record for " + id + " is missing its urlSlug value.");
+            }
 
             const sourcePage = new URL(artwork.urlSlug, window.location.origin).href;
             const imageURL = await getFinalGalleryImage(sourcePage);
 
             renderFeature(container, artwork, imageURL);
-            console.log("ELGIN Feature loaded:", id, sourcePage);
+            console.info("ELGIN Feature loaded:", id);
+
         } catch (error) {
             console.error("ELGIN Feature error for " + id + ":", error);
-            container.replaceChildren();
 
-            const message = document.createElement("p");
-            message.textContent = "Feature could not be loaded.";
-            container.appendChild(message);
+            showStatus(
+                container,
+                "ELGIN feature " + id + " could not load: " + error.message,
+                true
+            );
 
-            container.style.visibility = "visible";
-            container.removeAttribute("aria-busy");
             delete container.dataset.elginFeatureInitialized;
         }
     }
 
     function initializeAll() {
         addStyles();
-        document.querySelectorAll(SELECTOR).forEach(initializeFeature);
+
+        document.querySelectorAll(SELECTOR).forEach(container => {
+            initializeFeature(container);
+        });
     }
 
+    // Run at all relevant Squarespace lifecycle points.
     if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", initializeAll);
+        document.addEventListener("DOMContentLoaded", initializeAll, { once: true });
     } else {
         initializeAll();
     }
 
-    // Also detect feature blocks inserted after initial page load.
+    window.addEventListener("load", initializeAll);
+    document.addEventListener("mercury:load", initializeAll);
+
+    // Squarespace can insert code blocks after the initial page render.
     const observer = new MutationObserver(mutations => {
-        const addedFeature = mutations.some(mutation =>
-            Array.from(mutation.addedNodes).some(node =>
-                node.nodeType === 1 &&
-                (node.matches(SELECTOR) || node.querySelector(SELECTOR))
-            )
-        );
+        let shouldScan = false;
 
-        if (addedFeature) initializeAll();
+        for (const mutation of mutations) {
+            for (const node of mutation.addedNodes) {
+                if (node.nodeType !== 1) continue;
+
+                if (node.matches(SELECTOR) || node.querySelector(SELECTOR)) {
+                    shouldScan = true;
+                    break;
+                }
+            }
+
+            if (shouldScan) break;
+        }
+
+        if (shouldScan) initializeAll();
     });
 
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
+    if (document.documentElement) {
+        observer.observe(document.documentElement, {
+            childList: true,
+            subtree: true
+        });
+    }
+
+    // Final delayed scans cover late Squarespace block hydration.
+    window.setTimeout(initializeAll, 1000);
+    window.setTimeout(initializeAll, 3000);
 
 })();
