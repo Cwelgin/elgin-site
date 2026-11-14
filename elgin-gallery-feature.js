@@ -3,11 +3,9 @@
 ELGIN Gallery Feature
 Shared data-driven Squarespace component
 
-Squarespace usage — one artwork:
+Squarespace usage:
 <div class="elgin-feature" data-id="V001"></div>
-
-Squarespace usage — multiple artworks in one Code Block:
-<div class="elgin-feature-list" data-ids="V001,OBJ007,AA011"></div>
+<div class="elgin-feature" data-id="OBJ007"></div>
 ============================================================
 */
 
@@ -16,7 +14,6 @@ Squarespace usage — multiple artworks in one Code Block:
 
     const API_URL = "https://script.google.com/macros/s/AKfycbwsxbrVU3irqM75ymKLk4tsevplEDWWUUXKzLI6xHpn-psauODtWKghJyM2mqQS2ij0/exec";
     const SELECTOR = ".elgin-feature";
-    const LIST_SELECTOR = ".elgin-feature-list";
     const STYLE_ID = "elgin-gallery-feature-styles";
     const artworkCache = new Map();
     const imageCache = new Map();
@@ -27,15 +24,6 @@ Squarespace usage — multiple artworks in one Code Block:
         const style = document.createElement("style");
         style.id = STYLE_ID;
         style.textContent = `
-            .elgin-feature-list {
-                display: flex;
-                flex-direction: column;
-                gap: 32px;
-                width: 100%;
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
-            }
             .elgin-feature {
                 width: 100%;
                 margin: 0;
@@ -234,23 +222,46 @@ Squarespace usage — multiple artworks in one Code Block:
             .then(html => {
                 const doc = new DOMParser().parseFromString(html, "text/html");
 
-                const gallery = doc.querySelector(
-                    ".sqs-gallery-container .sqs-gallery, .sqs-gallery, [data-controller*='Gallery']"
+                const itemSelector =
+                    ".sqs-gallery-design-grid-slide, .slide, .gallery-grid-item, .gallery-item";
+
+                // Find every standard Squarespace gallery, then work backward
+                // so the final gallery on the page is selected.
+                const galleries = Array.from(
+                    doc.querySelectorAll(".sqs-gallery-container .sqs-gallery, .sqs-gallery")
                 );
+
+                let gallery = null;
+
+                for (let i = galleries.length - 1; i >= 0; i--) {
+                    if (galleries[i].querySelectorAll(itemSelector).length) {
+                        gallery = galleries[i];
+                        break;
+                    }
+                }
+
+                // Fallback for Squarespace gallery layouts that use a controller
+                // wrapper instead of the standard .sqs-gallery element.
+                if (!gallery) {
+                    const controllerGalleries = Array.from(
+                        doc.querySelectorAll("[data-controller*='Gallery']")
+                    );
+
+                    for (let i = controllerGalleries.length - 1; i >= 0; i--) {
+                        if (controllerGalleries[i].querySelectorAll(itemSelector).length) {
+                            gallery = controllerGalleries[i];
+                            break;
+                        }
+                    }
+                }
 
                 if (!gallery) {
-                    throw new Error("No Squarespace gallery was found on " + sourcePage);
+                    throw new Error("No Squarespace gallery containing images was found on " + sourcePage);
                 }
 
-                const items = gallery.querySelectorAll(
-                    ".sqs-gallery-design-grid-slide, .slide, .gallery-grid-item, .gallery-item"
-                );
+                const items = gallery.querySelectorAll(itemSelector);
 
-                if (!items.length) {
-                    throw new Error("The artwork page gallery contains no images.");
-                }
-
-                // Use the final gallery item, matching the established ELGIN feature behavior.
+                // Select the final image from the final gallery on the page.
                 const finalItem = items[items.length - 1];
                 const image = finalItem.querySelector("img");
                 const imageURL = extractImageURL(image, sourcePage);
@@ -318,39 +329,6 @@ Squarespace usage — multiple artworks in one Code Block:
         container.removeAttribute("aria-busy");
     }
 
-    async function initializeList(container) {
-        if (container.dataset.elginFeatureListInitialized === "true") return;
-
-        const ids = (container.getAttribute("data-ids") || "")
-            .split(",")
-            .map(id => id.trim())
-            .filter(Boolean);
-
-        if (!ids.length) {
-            showStatus(container, "ELGIN Feature List: add comma-separated artwork IDs to data-ids.", true);
-            console.error("ELGIN Feature List: no artwork IDs were provided.", container);
-            return;
-        }
-
-        container.dataset.elginFeatureListInitialized = "true";
-        container.replaceChildren();
-
-        const featureBlocks = ids.map(id => {
-            const feature = document.createElement("div");
-            feature.className = "elgin-feature";
-            feature.setAttribute("data-id", id);
-            container.appendChild(feature);
-            return feature;
-        });
-
-        // Load a small batch at a time to avoid sending 30 requests simultaneously.
-        const batchSize = 4;
-        for (let index = 0; index < featureBlocks.length; index += batchSize) {
-            const batch = featureBlocks.slice(index, index + batchSize);
-            await Promise.all(batch.map(initializeFeature));
-        }
-    }
-
     async function initializeFeature(container) {
         if (container.dataset.elginFeatureInitialized === "true") return;
 
@@ -396,12 +374,6 @@ Squarespace usage — multiple artworks in one Code Block:
     function initializeAll() {
         addStyles();
 
-        // Expand each multi-artwork list into individual feature rows.
-        document.querySelectorAll(LIST_SELECTOR).forEach(container => {
-            initializeList(container);
-        });
-
-        // Also retain support for existing single-artwork Code Blocks.
         document.querySelectorAll(SELECTOR).forEach(container => {
             initializeFeature(container);
         });
@@ -425,12 +397,7 @@ Squarespace usage — multiple artworks in one Code Block:
             for (const node of mutation.addedNodes) {
                 if (node.nodeType !== 1) continue;
 
-                if (
-                    node.matches(SELECTOR) ||
-                    node.matches(LIST_SELECTOR) ||
-                    node.querySelector(SELECTOR) ||
-                    node.querySelector(LIST_SELECTOR)
-                ) {
+                if (node.matches(SELECTOR) || node.querySelector(SELECTOR)) {
                     shouldScan = true;
                     break;
                 }
