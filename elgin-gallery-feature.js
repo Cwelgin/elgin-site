@@ -222,53 +222,45 @@ Squarespace usage:
             .then(html => {
                 const doc = new DOMParser().parseFromString(html, "text/html");
 
-                const itemSelector =
-                    ".sqs-gallery-design-grid-slide, .slide, .gallery-grid-item, .gallery-item";
-
-                // Find every standard Squarespace gallery, then work backward
-                // so the final gallery on the page is selected.
-                const galleries = Array.from(
-                    doc.querySelectorAll(".sqs-gallery-container .sqs-gallery, .sqs-gallery")
+                // Squarespace 7.1 gallery blocks on this site are separate
+                // block elements. Each gallery block has its own ID and
+                // contains slides marked .slide[data-type="image"].
+                const galleryBlocks = Array.from(
+                    doc.querySelectorAll('div[id^="block-"]')
+                ).filter(block =>
+                    block.querySelector('.slide[data-type="image"] img')
                 );
 
-                let gallery = null;
-
-                for (let i = galleries.length - 1; i >= 0; i--) {
-                    if (galleries[i].querySelectorAll(itemSelector).length) {
-                        gallery = galleries[i];
-                        break;
-                    }
+                if (!galleryBlocks.length) {
+                    throw new Error("No Squarespace gallery blocks containing images were found on " + sourcePage);
                 }
 
-                // Fallback for Squarespace gallery layouts that use a controller
-                // wrapper instead of the standard .sqs-gallery element.
-                if (!gallery) {
-                    const controllerGalleries = Array.from(
-                        doc.querySelectorAll("[data-controller*='Gallery']")
-                    );
+                // Use the last gallery block in document order.
+                const finalGallery = galleryBlocks[galleryBlocks.length - 1];
 
-                    for (let i = controllerGalleries.length - 1; i >= 0; i--) {
-                        if (controllerGalleries[i].querySelectorAll(itemSelector).length) {
-                            gallery = controllerGalleries[i];
-                            break;
-                        }
-                    }
-                }
+                // Within that gallery, use the last image slide.
+                const imageSlides = finalGallery.querySelectorAll(
+                    '.slide[data-type="image"]'
+                );
 
-                if (!gallery) {
-                    throw new Error("No Squarespace gallery containing images was found on " + sourcePage);
-                }
+                const finalSlide = imageSlides[imageSlides.length - 1];
+                const image = finalSlide
+                    ? finalSlide.querySelector("img.thumb-image, img")
+                    : null;
 
-                const items = gallery.querySelectorAll(itemSelector);
-
-                // Select the final image from the final gallery on the page.
-                const finalItem = items[items.length - 1];
-                const image = finalItem.querySelector("img");
                 const imageURL = extractImageURL(image, sourcePage);
 
                 if (!imageURL) {
-                    throw new Error("The final gallery image has no usable image URL.");
+                    throw new Error("The final image in the final gallery has no usable image URL.");
                 }
+
+                console.info(
+                    "ELGIN Feature: selected final gallery",
+                    finalGallery.id,
+                    "with",
+                    imageSlides.length,
+                    "images."
+                );
 
                 return imageURL;
             });
