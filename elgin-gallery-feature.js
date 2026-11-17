@@ -372,7 +372,7 @@ if (artwork.description) {
             link.href = new URL(artwork.urlSlug, window.location.origin).href;
             link.textContent = "Read more here";
             textWrap.appendChild(link);
-        }
+        } 
 
         inner.append(imageWrap, textWrap);
         container.replaceChildren(inner);
