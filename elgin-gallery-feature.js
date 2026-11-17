@@ -273,6 +273,49 @@ Squarespace usage:
         promise.catch(() => imageCache.delete(sourcePage));
         return promise;
     }
+    
+function renderDescriptionText(element, text) {
+    const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = linkPattern.exec(text)) !== null) {
+        // Add the ordinary text before the link.
+        element.appendChild(
+            document.createTextNode(text.slice(lastIndex, match.index))
+        );
+
+        const linkText = match[1];
+        const linkURL = match[2].trim();
+
+        try {
+            const url = new URL(linkURL, window.location.origin);
+
+            // Only allow safe web links.
+            if (url.protocol === "http:" || url.protocol === "https:") {
+                const anchor = document.createElement("a");
+                anchor.textContent = linkText;
+                anchor.href = url.href;
+                element.appendChild(anchor);
+            } else {
+                element.appendChild(
+                    document.createTextNode(match[0])
+                );
+            }
+        } catch (error) {
+            element.appendChild(
+                document.createTextNode(match[0])
+            );
+        }
+
+        lastIndex = linkPattern.lastIndex;
+    }
+
+    // Add any remaining text after the final link.
+    element.appendChild(
+        document.createTextNode(text.slice(lastIndex))
+    );
+}
 
     function renderFeature(container, artwork, imageURL) {
         const inner = document.createElement("div");
@@ -304,12 +347,16 @@ Squarespace usage:
             textWrap.appendChild(title);
         }
 
-        if (artwork.description) {
-            const description = document.createElement("p");
-            description.className = "elgin-feature-description";
-            description.textContent = artwork.description;
-            textWrap.appendChild(description);
-        }
+
+if (artwork.description) {
+    const description = document.createElement("p");
+    description.className = "elgin-feature-description";
+
+    renderDescriptionText(description, artwork.description);
+
+    textWrap.appendChild(description);
+}
+
 
         if (artwork.urlSlug) {
             const link = document.createElement("a");
