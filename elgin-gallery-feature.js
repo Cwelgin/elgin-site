@@ -75,6 +75,14 @@ Squarespace usage:
                 line-height: 1.6;
                 white-space: pre-line;
             }
+            .elgin-feature-description a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.elgin-feature-description a:hover {
+    opacity: 0.65;
+}
             .elgin-feature-link {
                 display: inline-block;
                 align-self: flex-start;
