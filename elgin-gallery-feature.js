@@ -76,13 +76,12 @@ Squarespace usage:
                 white-space: pre-line;
             }
             .elgin-feature-description a {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.elgin-feature-description a:hover {
-    opacity: 0.65;
-}
+                text-decoration: underline;
+                text-underline-offset: 3px;
+            }
+            .elgin-feature-description a:hover {
+                opacity: 0.65;
+            }
             .elgin-feature-link {
                 display: inline-block;
                 align-self: flex-start;
@@ -281,49 +280,41 @@ Squarespace usage:
         promise.catch(() => imageCache.delete(sourcePage));
         return promise;
     }
-    
-function renderDescriptionText(element, text) {
-    const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
-    let lastIndex = 0;
-    let match;
 
-    while ((match = linkPattern.exec(text)) !== null) {
-        // Add the ordinary text before the link.
-        element.appendChild(
-            document.createTextNode(text.slice(lastIndex, match.index))
-        );
+    // Convert Markdown-style links in artwork descriptions into clickable links.
+    function renderDescriptionText(element, text) {
+        const pattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+        const content = String(text || "");
+        let lastIndex = 0;
+        let match;
 
-        const linkText = match[1];
-        const linkURL = match[2].trim();
-
-        try {
-            const url = new URL(linkURL, window.location.origin);
-
-            // Only allow safe web links.
-            if (url.protocol === "http:" || url.protocol === "https:") {
-                const anchor = document.createElement("a");
-                anchor.textContent = linkText;
-                anchor.href = url.href;
-                element.appendChild(anchor);
-            } else {
-                element.appendChild(
-                    document.createTextNode(match[0])
-                );
-            }
-        } catch (error) {
+        while ((match = pattern.exec(content)) !== null) {
             element.appendChild(
-                document.createTextNode(match[0])
+                document.createTextNode(content.slice(lastIndex, match.index))
             );
+
+            try {
+                const url = new URL(match[2], window.location.origin);
+
+                if (url.protocol !== "http:" && url.protocol !== "https:") {
+                    throw new Error("Unsupported link protocol");
+                }
+
+                const link = document.createElement("a");
+                link.href = url.href;
+                link.textContent = match[1];
+                element.appendChild(link);
+            } catch (error) {
+                element.appendChild(document.createTextNode(match[0]));
+            }
+
+            lastIndex = pattern.lastIndex;
         }
 
-        lastIndex = linkPattern.lastIndex;
+        element.appendChild(
+            document.createTextNode(content.slice(lastIndex))
+        );
     }
-
-    // Add any remaining text after the final link.
-    element.appendChild(
-        document.createTextNode(text.slice(lastIndex))
-    );
-}
 
     function renderFeature(container, artwork, imageURL) {
         const inner = document.createElement("div");
@@ -355,16 +346,14 @@ function renderDescriptionText(element, text) {
             textWrap.appendChild(title);
         }
 
+        if (artwork.description) {
+            const description = document.createElement("p");
+            description.className = "elgin-feature-description";
 
-if (artwork.description) {
-    const description = document.createElement("p");
-    description.className = "elgin-feature-description";
+            renderDescriptionText(description, artwork.description);
 
-    renderDescriptionText(description, artwork.description);
-
-    textWrap.appendChild(description);
-}
-
+            textWrap.appendChild(description);
+        }
 
         if (artwork.urlSlug) {
             const link = document.createElement("a");
@@ -372,7 +361,7 @@ if (artwork.description) {
             link.href = new URL(artwork.urlSlug, window.location.origin).href;
             link.textContent = "Read more here";
             textWrap.appendChild(link);
-        } 
+        }
 
         inner.append(imageWrap, textWrap);
         container.replaceChildren(inner);
