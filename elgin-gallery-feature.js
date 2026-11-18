@@ -282,35 +282,47 @@ Squarespace usage:
     }
 
     // Convert Markdown-style links in artwork descriptions into clickable links.
+    // Supports relative URLs, full URLs, and same-page anchors such as
+    // [Objets Étranges](/abstracts#objets-etranges).
     function renderDescriptionText(element, text) {
-        const pattern = /\[([^\]]+)\]\(([^)\s]+)\)/g;
         const content = String(text || "");
+        const pattern = /\[([^\]]+)\]\(([^)]+)\)/g;
         let lastIndex = 0;
         let match;
 
         while ((match = pattern.exec(content)) !== null) {
+            // Preserve all ordinary text before the Markdown link.
             element.appendChild(
                 document.createTextNode(content.slice(lastIndex, match.index))
             );
 
-            try {
-                const url = new URL(match[2], window.location.origin);
+            const linkText = match[1];
+            const linkTarget = match[2].trim();
 
+            try {
+                const url = new URL(linkTarget, window.location.origin);
+
+                // Only allow standard web destinations.
                 if (url.protocol !== "http:" && url.protocol !== "https:") {
                     throw new Error("Unsupported link protocol");
                 }
 
                 const link = document.createElement("a");
                 link.href = url.href;
-                link.textContent = match[1];
+                link.textContent = linkText;
                 element.appendChild(link);
             } catch (error) {
-                element.appendChild(document.createTextNode(match[0]));
+                // If the target is invalid, preserve the original Markdown
+                // visibly rather than silently dropping the text.
+                element.appendChild(
+                    document.createTextNode(match[0])
+                );
             }
 
             lastIndex = pattern.lastIndex;
         }
 
+        // Preserve any text after the final Markdown link.
         element.appendChild(
             document.createTextNode(content.slice(lastIndex))
         );
